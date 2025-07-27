@@ -1,0 +1,14 @@
+#E5D9F2 
+#CDC1FF
+#A294F9
+#F5EFFF
+
+
+#C0C9EE
+#A2AADB    footer
+#898AC4
+
+#FFF2E0
+
+
+#f3414a
