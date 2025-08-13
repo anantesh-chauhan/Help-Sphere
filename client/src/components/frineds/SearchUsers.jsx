@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import axios from 'axios';
-import { useContext } from 'react';
+import { motion } from 'framer-motion';
 import { AppContent } from '../../context/AppContext';
 
 export default function SearchUsers() {
@@ -25,71 +25,129 @@ export default function SearchUsers() {
   const sendRequest = async (id) => {
     try {
       await axios.post(`${backendUrl}/api/friends/request`, { toUserId: id }, { withCredentials: true });
-      search(); // Refresh list after sending request
+      search();
     } catch (err) {
       console.error('Error sending friend request:', err);
     }
   };
 
+  const containerStyle = {
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '24px',
+    fontFamily: 'Arial, sans-serif'
+  };
+
+  const inputStyle = {
+    border: '1px solid #ccc',
+    padding: '10px',
+    flex: 1,
+    borderRadius: '8px 0 0 8px',
+    fontSize: '16px'
+  };
+
+  const buttonStyle = {
+    backgroundColor: '#2563eb',
+    color: '#fff',
+    padding: '10px 16px',
+    border: 'none',
+    borderRadius: '0 8px 8px 0',
+    cursor: 'pointer',
+    fontSize: '16px'
+  };
+
+  const cardStyle = {
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+    padding: '16px',
+    textAlign: 'center'
+  };
+
+  const avatarStyle = {
+    width: '100px',
+    height: '100px',
+    borderRadius: '50%',
+    marginBottom: '8px'
+  };
+
+  const statusButtonStyle = {
+    base: {
+      padding: '6px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      border: 'none',
+      fontSize: '14px',
+      cursor: 'pointer'
+    },
+    green: { backgroundColor: '#22c55e' },
+    yellow: { backgroundColor: '#facc15' },
+    blue: { backgroundColor: '#3b82f6' }
+  };
+
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Search Users</h1>
+    <div style={containerStyle}>
+      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px' }}>Search Users</h1>
 
       {/* Search Bar */}
-      <div className="flex mb-6">
+      <div style={{ display: 'flex', marginBottom: '24px' }}>
         <input
           value={query}
           onChange={e => setQuery(e.target.value)}
-          className="border p-2 flex-1 rounded-l"
+          style={inputStyle}
           placeholder="Search users..."
         />
-        <button
-          onClick={search}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 rounded-r"
-        >
-          Search
-        </button>
+        <button onClick={search} style={buttonStyle}>Search</button>
       </div>
 
       {loading ? (
-        <div className="text-center p-6">Searching users...</div>
+        <div style={{ textAlign: 'center', padding: '24px' }}>Searching users...</div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '16px'
+        }}>
           {results.map(user => (
-            <div
+            <motion.div
               key={user._id}
-              className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center text-center"
+              style={cardStyle}
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
             >
-              <img
+              <motion.img
                 src={user.avatar || defaultAvatar}
                 alt={user.name || 'User'}
-                style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+                style={avatarStyle}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.4 }}
               />
-              <h2 className="text-lg font-semibold">{user.name}</h2>
-              <p className="text-gray-500 text-sm">{user.email}</p>
+              <h2 style={{ fontSize: '18px', fontWeight: 'bold' }}>{user.name}</h2>
+              <p style={{ color: '#6b7280', fontSize: '14px' }}>{user.email}</p>
 
-              <div className="flex space-x-4 mt-2 text-sm text-gray-600">
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '8px', fontSize: '14px', color: '#4b5563' }}>
                 <span>Donations: {user.donations ?? 0}</span>
                 <span>Helps: {user.helpRequests ?? 0}</span>
               </div>
 
-              <div className="mt-4">
+              <div style={{ marginTop: '12px' }}>
                 {user.friendStatus === 'not_friend' && (
                   <button
                     onClick={() => sendRequest(user._id)}
-                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded"
+                    style={{ ...statusButtonStyle.base, ...statusButtonStyle.green }}
                   >
                     Add Friend
                   </button>
                 )}
                 {user.friendStatus === 'pending' && (
-                  <span className="bg-yellow-400 text-white px-3 py-1 rounded">Pending</span>
+                  <span style={{ ...statusButtonStyle.base, ...statusButtonStyle.yellow }}>Pending</span>
                 )}
                 {user.friendStatus === 'friend' && (
-                  <span className="bg-blue-500 text-white px-3 py-1 rounded">Friends</span>
+                  <span style={{ ...statusButtonStyle.base, ...statusButtonStyle.blue }}>Friends</span>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}

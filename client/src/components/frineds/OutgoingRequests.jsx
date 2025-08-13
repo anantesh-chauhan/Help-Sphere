@@ -3,43 +3,41 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { AppContent } from "../../context/AppContext";
 
-export default function IncomingRequests() {
+export default function OutgoingRequests() {
   const [requests, setRequests] = useState([]);
   const { backendUrl } = useContext(AppContent);
-  const defaultAvatar =
-    "https://res.cloudinary.com/dlixtmy1x/image/upload/v1755115315/avatar_izmj6c.webp";
+  const defaultAvatar = "https://res.cloudinary.com/dlixtmy1x/image/upload/v1755115315/avatar_izmj6c.webp";
 
+  // Load outgoing requests
   const load = async () => {
     try {
-      const res = await axios.get(`${backendUrl}/api/friends/incoming`, {
-        withCredentials: true,
-      });
+      const res = await axios.get(`${backendUrl}/api/friends/outgoing`, { withCredentials: true });
       setRequests(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      console.error("Error loading requests:", err);
+      console.error("Error loading outgoing requests:", err);
     }
   };
 
-  const accept = async (id) => {
-    await axios.post(`${backendUrl}/api/friends/accept/${id}`, {}, { withCredentials: true });
-    setRequests((prev) => prev.filter((r) => r._id !== id));
-  };
-
-  const reject = async (id) => {
-    await axios.post(`${backendUrl}/api/friends/reject/${id}`, {}, { withCredentials: true });
-    setRequests((prev) => prev.filter((r) => r._id !== id));
+  // Cancel friend request
+  const cancel = async (id) => {
+    try {
+      await axios.post(`${backendUrl}/api/friends/reject/${id}`, {}, { withCredentials: true });
+      setRequests((prev) => prev.filter((r) => r._id !== id)); // instantly update UI
+    } catch (err) {
+      console.error("Error cancelling request:", err);
+    }
   };
 
   useEffect(() => {
     load();
   }, []);
 
-  // Shared styles from SearchUsers
+  // Shared Styles (same as SearchUsers)
   const containerStyle = {
     maxWidth: "1200px",
     margin: "0 auto",
     padding: "24px",
-    fontFamily: "Arial, sans-serif",
+    fontFamily: "Arial, sans-serif"
   };
 
   const cardStyle = {
@@ -47,14 +45,14 @@ export default function IncomingRequests() {
     borderRadius: "12px",
     boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
     padding: "16px",
-    textAlign: "center",
+    textAlign: "center"
   };
 
   const avatarStyle = {
     width: "100px",
     height: "100px",
     borderRadius: "50%",
-    marginBottom: "8px",
+    marginBottom: "8px"
   };
 
   const buttonStyle = {
@@ -64,28 +62,27 @@ export default function IncomingRequests() {
       color: "#fff",
       border: "none",
       fontSize: "14px",
-      cursor: "pointer",
+      cursor: "pointer"
     },
-    green: { backgroundColor: "#4caf50" },
-    red: { backgroundColor: "#e53935" },
+    red: { backgroundColor: "#e53935" }
   };
 
   return (
     <div style={containerStyle}>
       <h1 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "24px" }}>
-        Incoming Friend Requests
+        Outgoing Friend Requests
       </h1>
 
       {requests.length === 0 ? (
         <div style={{ textAlign: "center", padding: "24px", color: "#666" }}>
-          No incoming friend requests.
+          No outgoing friend requests.
         </div>
       ) : (
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "16px",
+            gap: "16px"
           }}
         >
           {requests.map((r) => (
@@ -96,15 +93,15 @@ export default function IncomingRequests() {
               transition={{ duration: 0.3 }}
             >
               <motion.img
-                src={r.from?.avatar || defaultAvatar}
-                alt={r.from?.name || "User"}
+                src={r.to?.avatar || defaultAvatar}
+                alt={r.to?.name || "User"}
                 style={avatarStyle}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.4 }}
               />
-              <h2 style={{ fontSize: "18px", fontWeight: "bold" }}>{r.from?.name}</h2>
-              <p style={{ color: "#6b7280", fontSize: "14px" }}>{r.from?.email}</p>
+              <h2 style={{ fontSize: "18px", fontWeight: "bold" }}>{r.to?.name}</h2>
+              <p style={{ color: "#6b7280", fontSize: "14px" }}>{r.to?.email}</p>
 
               <div
                 style={{
@@ -113,25 +110,19 @@ export default function IncomingRequests() {
                   gap: "12px",
                   marginTop: "8px",
                   fontSize: "14px",
-                  color: "#4b5563",
+                  color: "#4b5563"
                 }}
               >
-                <span>Donations: {r.from?.donations ?? 0}</span>
-                <span>Helps: {r.from?.helpRequests ?? 0}</span>
+                <span>Donations: {r.to?.donations ?? 0}</span>
+                <span>Helps: {r.to?.helpRequests ?? 0}</span>
               </div>
 
-              <div style={{ marginTop: "12px", display: "flex", gap: "8px", justifyContent: "center" }}>
+              <div style={{ marginTop: "12px" }}>
                 <button
-                  onClick={() => accept(r._id)}
-                  style={{ ...buttonStyle.base, ...buttonStyle.green }}
-                >
-                  Accept
-                </button>
-                <button
-                  onClick={() => reject(r._id)}
+                  onClick={() => cancel(r._id)}
                   style={{ ...buttonStyle.base, ...buttonStyle.red }}
                 >
-                  Reject
+                  Cancel Request
                 </button>
               </div>
             </motion.div>

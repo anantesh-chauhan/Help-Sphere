@@ -1,84 +1,214 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useContext } from 'react';
-import { AppContent } from '../../context/AppContext';
+import { useEffect, useState, useContext } from "react";
+import axios from "axios";
+import { motion } from "framer-motion";
+import { AppContent } from "../../context/AppContext";
 
 export default function AllUsersPage() {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const { backendUrl } = useContext(AppContent);
-    const defaultAvatar = 'https://res.cloudinary.com/dlixtmy1x/image/upload/v1755115315/avatar_izmj6c.webp'
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { backendUrl } = useContext(AppContent);
+  const defaultAvatar =
+    "https://res.cloudinary.com/dlixtmy1x/image/upload/v1755115315/avatar_izmj6c.webp";
 
-    const fetchUsers = async () => {
-        try {
-            setLoading(true);
-            const res = await axios.get(`${backendUrl}/api/friends/users`, { withCredentials: true });
-            console.log(res.data);
-            setUsers(Array.isArray(res.data) ? res.data : res.data.users || []);
-        } catch (err) {
-            console.error('Error fetching users:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
-    const sendFriendRequest = async (id) => {
-        try {
-            await axios.post(`${backendUrl}/api/friends/request`, { toUserId: id }, { withCredentials: true });
-            fetchUsers(); // Refresh to update status
-        } catch (err) {
-            console.error('Error sending request:', err);
-        }
-    };
-
-    useEffect(() => {
-        fetchUsers();
-    }, []);
-
-    if (loading) {
-        return <div className="text-center p-6">Loading users...</div>;
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${backendUrl}/api/friends/users`, {
+        withCredentials: true,
+      });
+      setUsers(Array.isArray(res.data) ? res.data : res.data.users || []);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    } finally {
+      setLoading(false);
     }
+  };
 
+  const sendFriendRequest = async (id) => {
+    try {
+      await axios.post(
+        `${backendUrl}/api/friends/request`,
+        { toUserId: id },
+        { withCredentials: true }
+      );
+      fetchUsers();
+    } catch (err) {
+      console.error("Error sending request:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  if (loading) {
     return (
-        <div className="max-w-6xl mx-auto p-6">
-            <h1 className="text-2xl font-bold mb-6">All Users</h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {users.map(user => (
-                    <div key={user._id} className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center text-center">
-                        <img
-                            src={defaultAvatar}
-                            alt={user.name || 'User'}
-
-                            style={{ width: '100px', height: '100px', borderRadius: '50%' }}
-                        />
-                        <h2 className="text-lg font-semibold">{user.name}</h2>
-                        <p className="text-gray-500 text-sm">{user.email}</p>
-
-                        <div className="flex space-x-4 mt-2 text-sm text-gray-600">
-                            <span>Donations: {user.donations ?? 0}</span>
-                            <span>Helps: {user.helpRequests ?? 0}</span>
-                        </div>
-
-                        <div className="mt-4">
-                            {user.friendStatus === 'not_friend' && (
-                                <button
-                                    onClick={() => sendFriendRequest(user._id)}
-                                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded"
-                                >
-                                    Add Friend
-                                </button>
-                            )}
-                            {user.friendStatus === 'pending' && (
-                                <span className="bg-yellow-400 text-white px-3 py-1 rounded">Pending</span>
-                            )}
-                            {user.friendStatus === 'friend' && (
-                                <span className="bg-blue-500 text-white px-3 py-1 rounded">Friends</span>
-                            )}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
+      <motion.div
+        style={{
+          textAlign: "center",
+          padding: "40px",
+          fontSize: "1.1rem",
+          color: "#555",
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        Loading users...
+      </motion.div>
     );
+  }
+
+  return (
+    <motion.div
+      style={{
+        maxWidth: "1100px",
+        margin: "auto",
+        padding: "20px",
+      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
+      <h1
+        style={{
+          fontSize: "2rem",
+          fontWeight: "bold",
+          marginBottom: "20px",
+          textAlign: "center",
+        }}
+      >
+        All Users
+      </h1>
+      <motion.div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+          gap: "20px",
+        }}
+        initial="hidden"
+        animate="show"
+        variants={{
+          hidden: { opacity: 0 },
+          show: {
+            opacity: 1,
+            transition: { staggerChildren: 0.15 },
+          },
+        }}
+      >
+        {users.map((user) => (
+          <motion.div
+            key={user._id}
+            style={{
+              background: "white",
+              borderRadius: "12px",
+              boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
+              padding: "20px",
+              textAlign: "center",
+            }}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              show: { opacity: 1, y: 0 },
+            }}
+            whileHover={{ scale: 1.03 }}
+          >
+            <img
+              src={defaultAvatar}
+              alt={user.name || "User"}
+              style={{
+                width: "100px",
+                height: "100px",
+                borderRadius: "50%",
+                objectFit: "cover",
+              }}
+            />
+            <h2
+              style={{
+                fontSize: "1.2rem",
+                fontWeight: "600",
+                marginTop: "10px",
+              }}
+            >
+              {user.name}
+            </h2>
+            <p
+              style={{
+                fontSize: "0.9rem",
+                color: "#666",
+              }}
+            >
+              {user.email}
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-around",
+                marginTop: "8px",
+                fontSize: "0.9rem",
+                color: "#555",
+              }}
+            >
+              <span>Donations: {user.donations ?? 0}</span>
+              <span>Helps: {user.helpRequests ?? 0}</span>
+            </div>
+
+            <div style={{ marginTop: "15px" }}>
+              {user.friendStatus === "not_friend" && (
+                <motion.button
+                  style={{
+                    border: "none",
+                    padding: "8px 16px",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    color: "white",
+                    backgroundColor: "#28a745",
+                  }}
+                  onClick={() => sendFriendRequest(user._id)}
+                  whileHover={{ scale: 1.05, backgroundColor: "#218838" }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Add Friend
+                </motion.button>
+              )}
+              {user.friendStatus === "pending" && (
+                <motion.span
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: "6px",
+                    fontWeight: "bold",
+                    fontSize: "0.85rem",
+                    backgroundColor: "#ffc107",
+                    color: "white",
+                    display: "inline-block",
+                  }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  Pending
+                </motion.span>
+              )}
+              {user.friendStatus === "friend" && (
+                <motion.span
+                  style={{
+                    padding: "5px 12px",
+                    borderRadius: "6px",
+                    fontWeight: "bold",
+                    fontSize: "0.85rem",
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    display: "inline-block",
+                  }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  Friends
+                </motion.span>
+              )}
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </motion.div>
+  );
 }

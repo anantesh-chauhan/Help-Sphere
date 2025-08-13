@@ -2,8 +2,8 @@ import { useState } from 'react';
 import SearchUsers from './SearchUsers';
 import IncomingRequests from './IncomingRequests';
 import AllUsersPage from './AllUsers';
-// import OutgoingRequests from './OutgoingRequests';
-// import FriendsList from './FriendsList';
+import OutgoingRequests from './OutgoingRequests';
+import FriendsList from './FriendsList';
 
 export default function FriendsHub() {
   const [tab, setTab] = useState('search');
@@ -33,9 +33,9 @@ export default function FriendsHub() {
 
       {tab === 'search' && <SearchUsers />}
       {tab === 'all-users' && <AllUsersPage />}
-      {/* {tab === 'incoming' && <IncomingRequests />} */}
-      {/* {tab === 'outgoing' && <OutgoingRequests />} */}
-      {/* {tab === 'friends' && <FriendsList />} */}
+      {tab === 'incoming' && <IncomingRequests />}
+      {tab === 'outgoing' && <OutgoingRequests />}
+      {tab === 'friends' && <FriendsList />}
     </div>
   );
 }

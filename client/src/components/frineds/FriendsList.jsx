@@ -3,38 +3,40 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { AppContent } from "../../context/AppContext";
 
-export default function IncomingRequests() {
-  const [requests, setRequests] = useState([]);
+export default function FriendsList() {
+  const [friends, setFriends] = useState([]);
   const { backendUrl } = useContext(AppContent);
   const defaultAvatar =
     "https://res.cloudinary.com/dlixtmy1x/image/upload/v1755115315/avatar_izmj6c.webp";
 
   const load = async () => {
     try {
-      const res = await axios.get(`${backendUrl}/api/friends/incoming`, {
+      const res = await axios.get(`${backendUrl}/api/friends`, {
         withCredentials: true,
       });
-      setRequests(Array.isArray(res.data) ? res.data : []);
+      setFriends(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      console.error("Error loading requests:", err);
+      console.error("Error loading friends:", err);
     }
   };
 
-  const accept = async (id) => {
-    await axios.post(`${backendUrl}/api/friends/accept/${id}`, {}, { withCredentials: true });
-    setRequests((prev) => prev.filter((r) => r._id !== id));
-  };
-
-  const reject = async (id) => {
-    await axios.post(`${backendUrl}/api/friends/reject/${id}`, {}, { withCredentials: true });
-    setRequests((prev) => prev.filter((r) => r._id !== id));
+  const removeFriend = async (id) => {
+    if (!window.confirm("Are you sure you want to remove this friend?")) return;
+    try {
+      await axios.delete(`${backendUrl}/api/friends/${id}`, {
+        withCredentials: true,
+      });
+      setFriends((prev) => prev.filter((f) => f._id !== id));
+    } catch (err) {
+      console.error("Error removing friend:", err);
+    }
   };
 
   useEffect(() => {
     load();
   }, []);
 
-  // Shared styles from SearchUsers
+  // Shared styles
   const containerStyle = {
     maxWidth: "1200px",
     margin: "0 auto",
@@ -66,19 +68,18 @@ export default function IncomingRequests() {
       fontSize: "14px",
       cursor: "pointer",
     },
-    green: { backgroundColor: "#4caf50" },
     red: { backgroundColor: "#e53935" },
   };
 
   return (
     <div style={containerStyle}>
       <h1 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "24px" }}>
-        Incoming Friend Requests
+        My Friends
       </h1>
 
-      {requests.length === 0 ? (
+      {friends.length === 0 ? (
         <div style={{ textAlign: "center", padding: "24px", color: "#666" }}>
-          No incoming friend requests.
+          You have no friends yet.
         </div>
       ) : (
         <div
@@ -88,23 +89,23 @@ export default function IncomingRequests() {
             gap: "16px",
           }}
         >
-          {requests.map((r) => (
+          {friends.map((f) => (
             <motion.div
-              key={r._id}
+              key={f._id}
               style={cardStyle}
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.3 }}
             >
               <motion.img
-                src={r.from?.avatar || defaultAvatar}
-                alt={r.from?.name || "User"}
+                src={f.avatar || defaultAvatar}
+                alt={f.name || "User"}
                 style={avatarStyle}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.4 }}
               />
-              <h2 style={{ fontSize: "18px", fontWeight: "bold" }}>{r.from?.name}</h2>
-              <p style={{ color: "#6b7280", fontSize: "14px" }}>{r.from?.email}</p>
+              <h2 style={{ fontSize: "18px", fontWeight: "bold" }}>{f.name}</h2>
+              <p style={{ color: "#6b7280", fontSize: "14px" }}>{f.email}</p>
 
               <div
                 style={{
@@ -116,22 +117,16 @@ export default function IncomingRequests() {
                   color: "#4b5563",
                 }}
               >
-                <span>Donations: {r.from?.donations ?? 0}</span>
-                <span>Helps: {r.from?.helpRequests ?? 0}</span>
+                <span>Donations: {f.donations ?? 0}</span>
+                <span>Helps: {f.helpRequests ?? 0}</span>
               </div>
 
-              <div style={{ marginTop: "12px", display: "flex", gap: "8px", justifyContent: "center" }}>
+              <div style={{ marginTop: "12px" }}>
                 <button
-                  onClick={() => accept(r._id)}
-                  style={{ ...buttonStyle.base, ...buttonStyle.green }}
-                >
-                  Accept
-                </button>
-                <button
-                  onClick={() => reject(r._id)}
+                  onClick={() => removeFriend(f._id)}
                   style={{ ...buttonStyle.base, ...buttonStyle.red }}
                 >
-                  Reject
+                  Remove Friend
                 </button>
               </div>
             </motion.div>
