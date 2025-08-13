@@ -1,8 +1,21 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion";
 import { AppContent } from "../../../../context/AppContext";
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1, 
+    transition: { staggerChildren: 0.2 } 
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
 const MyClaims = () => {
   const { userData, backendUrl } = useContext(AppContent);
@@ -12,10 +25,9 @@ const MyClaims = () => {
   const fetchClaims = async () => {
     try {
       const res = await axios.get(`${backendUrl}/api/items/my-claims/${userData._id}`);
-      console.log("Result in my claims", res.data);
       setClaims(res.data);
     } catch (err) {
-      toast.error("Failed to fetch claimed items");
+      toast.error("❌ Failed to fetch claimed items");
     } finally {
       setLoading(false);
     }
@@ -27,31 +39,88 @@ const MyClaims = () => {
     }
   }, []);
 
-  if (loading) return <div className="text-center mt-8">Loading...</div>;
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "2rem", fontSize: "1.2rem", color: "#666" }}>
+        ⏳ Loading your claims...
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-center text-green-700">My Claimed Donations</h2>
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      style={{
+        padding: "20px",
+        maxWidth: "1200px",
+        margin: "auto",
+        backgroundColor: "#f0fdf4",
+        borderRadius: "10px",
+      }}
+    >
+      <h2
+        style={{
+          fontSize: "1.8rem",
+          fontWeight: "bold",
+          marginBottom: "20px",
+          textAlign: "center",
+          color: "#15803d",
+        }}
+      >
+        📦 My Claimed Donations
+      </h2>
+
       {claims.length === 0 ? (
-        <p className="text-center text-gray-500">You haven't claimed any items yet.</p>
+        <p style={{ textAlign: "center", color: "#666", fontSize: "1rem" }}>
+          😔 You haven't claimed any items yet.
+        </p>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "20px",
+          }}
+        >
           {claims.map((item) => (
-            <div key={item._id} className="border p-4 rounded-md shadow hover:shadow-lg transition">
+            <motion.div
+              key={item._id}
+              variants={cardVariants}
+              style={{
+                border: "1px solid #ddd",
+                padding: "15px",
+                borderRadius: "10px",
+                background: "#fff",
+                boxShadow: "0px 4px 12px rgba(0,0,0,0.05)",
+                transition: "transform 0.2s",
+              }}
+              whileHover={{ scale: 1.03 }}
+            >
               <img
-                src={item.imageUrls?.[0] || "/placeholder.jpg"}
+                src={item.imageUrls[0]}
                 alt={item.title}
-                className="h-40 w-full object-cover rounded mb-2"
+                className="w-full object-contain rounded-md mb-3 bg-gray-100"
+                style={{ height: "250px" }}
               />
-              <h3 className="text-lg font-semibold">{item.title}</h3>
-              <p className="text-sm text-gray-600">{item.description}</p>
-              <p className="text-sm text-gray-700 mt-1">Category: {item.category}</p>
-              <p className="text-xs text-gray-500 mt-2">Claimed on: {new Date(item.claimedAt).toLocaleDateString()}</p>
-            </div>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: "bold", marginBottom: "5px" }}>
+                🎁 {item.title}
+              </h3>
+              <p style={{ fontSize: "0.9rem", color: "#555", marginBottom: "5px" }}>
+                {item.description}
+              </p>
+              <p style={{ fontSize: "0.85rem", color: "#444" }}>
+                🏷 Category: {item.category}
+              </p>
+              <p style={{ fontSize: "0.75rem", color: "#777", marginTop: "8px" }}>
+                📅 Claimed on: {new Date(item.claimedAt).toLocaleDateString()}
+              </p>
+            </motion.div>
           ))}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

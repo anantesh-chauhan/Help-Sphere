@@ -4,7 +4,6 @@ import {
   Button,
   MenuItem,
   Box,
-  Typography,
   Card,
   CardContent,
   CardHeader,
@@ -20,14 +19,20 @@ const ReportBug = () => {
   const [steps, setSteps] = useState("");
   const [severity, setSeverity] = useState("Medium");
 
+  const severityEmojis = {
+    Low: "🟢",
+    Medium: "🟡",
+    High: "🔴",
+  };
+
   const handleSubmit = async () => {
     if (!userData) {
-      toast.error("Please log in first to report an issue.");
+      toast.error("⚠️ Please log in first to report an issue.");
       return;
     }
 
     if (!description.trim()) {
-      toast.error("Description is required.");
+      toast.error("⚠️ Description is required.");
       return;
     }
 
@@ -39,34 +44,24 @@ const ReportBug = () => {
 
     const result = await httpAction(data);
     if (result.success) {
-      toast.success("Bug reported successfully!");
+      toast.success("✅ Bug reported successfully!");
       setDescription("");
       setSteps("");
       setSeverity("Medium");
     } else {
-      toast.error(result.message || "Failed to report bug.");
+      toast.error(result.message || "❌ Failed to report bug.");
     }
   };
 
   return (
-    <Box
-      sx={{
-        maxWidth: 600,
-        mx: "auto",
-        mt: 6,
-        mb: 6,
-        px: 2,
-      }}
-    >
+    <Box sx={{ maxWidth: 600, mx: "auto", mt: 6, mb: 6, px: 2 }}>
       <Card
         sx={{
           borderRadius: 4,
           boxShadow: 3,
           background: "#f9f9ff",
           transition: "0.3s ease-in-out",
-          "&:hover": {
-            boxShadow: 6,
-          },
+          "&:hover": { boxShadow: 6 },
         }}
       >
         <CardHeader
@@ -74,7 +69,7 @@ const ReportBug = () => {
           subheader="Help us improve by reporting an issue."
           sx={{
             backgroundColor: "#f3414a",
-            color: "black",
+            color: "white",
             borderTopLeftRadius: 16,
             borderTopRightRadius: 16,
             textAlign: "center",
@@ -83,7 +78,7 @@ const ReportBug = () => {
 
         <CardContent>
           <TextField
-            label="Bug Description"
+            label="🐛 Bug Description"
             fullWidth
             multiline
             required
@@ -93,7 +88,7 @@ const ReportBug = () => {
             margin="normal"
           />
           <TextField
-            label="Steps to Reproduce"
+            label="📝 Steps to Reproduce"
             fullWidth
             multiline
             rows={2}
@@ -102,7 +97,7 @@ const ReportBug = () => {
             margin="normal"
           />
           <TextField
-            label="Severity"
+            label="⚡ Severity"
             fullWidth
             select
             value={severity}
@@ -111,7 +106,7 @@ const ReportBug = () => {
           >
             {["Low", "Medium", "High"].map((level) => (
               <MenuItem key={level} value={level}>
-                {level}
+                {severityEmojis[level]} {level}
               </MenuItem>
             ))}
           </TextField>
@@ -126,12 +121,10 @@ const ReportBug = () => {
                 fontWeight: 600,
                 px: 4,
                 py: 1,
-                "&:hover": {
-                  backgroundColor: "#f3414a",
-                },
+                "&:hover": { backgroundColor: "#f3414a" },
               }}
             >
-              Submit Bug Report
+              📨 Submit Bug Report
             </Button>
           </Box>
         </CardContent>

@@ -5,97 +5,50 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AppContent } from '../../../../context/AppContext';
 
-
-const categories = ['Food',
-    'Medicine',
-    'Shelter',
-    'Transport',
-    'Education',
-    'Clothing',
-    'Legal Aid',
-    'Financial Support',
-    'Mental Health',
-    'Employment',
-    'Other'];
+const categories = [
+  'Food','Medicine','Shelter','Transport','Education','Clothing',
+  'Legal Aid','Financial Support','Mental Health','Employment','Other'
+];
 const priorities = ['low', 'medium', 'high'];
 
 const RequestHelp = () => {
   const { userData } = useContext(AppContent);
-  console.log("userData in RequestHelp:", userData)
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    title: '',
-    description: '',
-    message: '',
-    category: '',
-    customCategory: '',
-    location: '',
-    neededBy: '',
-    priority: 'medium',
+    title: '', description: '', message: '', category: '', customCategory: '',
+    location: '', neededBy: '', priority: 'medium',
   });
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const finalCategory =
-      form.category === 'Other' ? form.customCategory || 'Other' : form.category;
+    const finalCategory = form.category === 'Other' ? form.customCategory || 'Other' : form.category;
 
     try {
-      const res = await axios.post(
+      await axios.post(
         'http://localhost:5050/help/request',
-        {
-          title: form.title,
-          description: form.description,
-          message: form.message,
-          category: finalCategory,
-          location: form.location,
-          neededBy: form.neededBy || null,
-          priority: form.priority,
-        },
+        { ...form, category: finalCategory, neededBy: form.neededBy || null },
         { withCredentials: true }
       );
-
-      toast.success('Help request submitted!');
-      setForm({
-        title: '',
-        description: '',
-        message: '',
-        category: '',
-        customCategory: '',
-        location: '',
-        neededBy: '',
-        priority: 'medium',
-      });
+      toast.success('✅ Help request submitted!');
+      setForm({ title:'', description:'', message:'', category:'', customCategory:'', location:'', neededBy:'', priority:'medium' });
     } catch (err) {
       console.error(err);
-      toast.error('Failed to submit request');
+      toast.error('❌ Failed to submit request');
     }
   };
 
   if (!userData) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="min-h-screen flex justify-center items-center px-4"
-      >
-        <motion.div
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          className="p-6 bg-white rounded-lg shadow-xl text-center max-w-md"
-        >
-          <h2 className="text-2xl font-bold text-red-600 mb-4">🔒 Login Required</h2>
-          <p className="text-gray-700 mb-4">
-            You need to <span className="text-blue-600 font-semibold">log in</span> before submitting a help request.
-          </p>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ minHeight:'100vh', display:'flex', justifyContent:'center', alignItems:'center', padding:20 }}>
+        <motion.div initial={{ scale:0.9 }} animate={{ scale:1 }} style={{ background:'#fff', padding:30, borderRadius:10, boxShadow:'0 4px 12px rgba(0,0,0,0.2)', textAlign:'center', maxWidth:400 }}>
+          <h2 style={{ fontSize:24, color:'#E53935', marginBottom:16 }}>🔒 Login Required</h2>
+          <p style={{ color:'#555', marginBottom:20 }}>You need to <span style={{ color:'#1E88E5', fontWeight:'bold' }}>log in</span> before submitting a help request.</p>
           <button
             onClick={() => navigate('/login')}
-            style={{ backgroundColor: '#4CAF50', color: 'white', padding: '10px 20px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '16px' }}
+            style={{ backgroundColor:'#4CAF50', color:'#fff', padding:'10px 20px', border:'none', borderRadius:5, cursor:'pointer', fontSize:16 }}
           >
             Go to Login
           </button>
@@ -104,145 +57,78 @@ const RequestHelp = () => {
     );
   }
 
+  const containerStyle = { minHeight:'100vh', display:'flex', justifyContent:'center', alignItems:'center', padding:20, background:'linear-gradient(135deg, #D1C4E9, #BBDEFB)' };
+  const cardStyle = { width:'100%', maxWidth:700, background:'#fff', borderRadius:12, padding:30, boxShadow:'0 8px 24px rgba(0,0,0,0.2)' };
+  const inputStyle = { padding:10, borderRadius:6, border:'1px solid #ccc', width:'100%', fontSize:14 };
+  const labelStyle = { marginBottom:6, fontWeight:'bold', color:'#555', display:'block' };
+  const sectionStyle = { marginBottom:20 };
+  const buttonStyle = { backgroundColor:'#43A047', color:'#fff', padding:'12px 0', border:'none', borderRadius:8, fontSize:16, fontWeight:'bold', cursor:'pointer', width:'100%' };
+
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      className="min-h-screen flex items-center justify-center px-4 py-8 bg-gradient-to-br from-purple-100 to-blue-100"
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-4xl p-8 bg-white rounded-lg shadow-2xl"
-      >
-        <h2 className="text-3xl font-bold text-green-700 mb-6 text-center">
-          📢 Submit a Help Request
-        </h2>
+    <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ duration:1 }} style={containerStyle}>
+      <motion.div initial={{ scale:0.9, opacity:0 }} animate={{ scale:1, opacity:1 }} transition={{ duration:0.6 }} style={cardStyle}>
+        <h2 style={{ fontSize:28, color:'#2E7D32', marginBottom:24, textAlign:'center' }}>📢 Submit a Help Request</h2>
+        <form onSubmit={handleSubmit}>
+          
+          <div style={sectionStyle}>
+            <h3 style={{ fontSize:18, fontWeight:'bold', marginBottom:12 }}>📄 Request Info</h3>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:12 }}>
+              <div>
+                <label style={labelStyle}>Title</label>
+                <input name="title" value={form.title} onChange={handleChange} required style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Description</label>
+                <textarea name="description" value={form.description} onChange={handleChange} rows={3} required style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Additional Message</label>
+                <textarea name="message" value={form.message} onChange={handleChange} rows={2} style={inputStyle} />
+              </div>
+            </div>
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Section title="📄 Request Info">
-            <Input label="Title" name="title" value={form.title} onChange={handleChange} required />
-            <Textarea
-              label="Description"
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              rows={3}
-              required
-            />
-            <Textarea
-              label="Additional Message"
-              name="message"
-              value={form.message}
-              onChange={handleChange}
-              rows={2}
-            />
-          </Section>
+          <div style={sectionStyle}>
+            <h3 style={{ fontSize:18, fontWeight:'bold', marginBottom:12 }}>📍 Location & Category</h3>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:12 }}>
+              <div>
+                <label style={labelStyle}>Location</label>
+                <input name="location" value={form.location} onChange={handleChange} required style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Category</label>
+                <select name="category" value={form.category} onChange={handleChange} required style={inputStyle}>
+                  <option value="">Select Category</option>
+                  {categories.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                </select>
+              </div>
+              {form.category === 'Other' && (
+                <div>
+                  <label style={labelStyle}>Custom Category</label>
+                  <input name="customCategory" value={form.customCategory} onChange={handleChange} style={inputStyle} />
+                </div>
+              )}
+              <div>
+                <label style={labelStyle}>Needed By</label>
+                <input type="date" name="neededBy" value={form.neededBy} onChange={handleChange} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Priority</label>
+                <select name="priority" value={form.priority} onChange={handleChange} style={inputStyle}>
+                  {priorities.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
 
-          <Section title="📍 Location & Category">
-            <Input label="Location" name="location" value={form.location} onChange={handleChange} required />
-            <Select
-              label="Category"
-              name="category"
-              value={form.category}
-              onChange={handleChange}
-              options={categories}
-              required
-            />
-            {form.category === 'Other' && (
-              <Input
-                label="Custom Category"
-                name="customCategory"
-                value={form.customCategory}
-                onChange={handleChange}
-              />
-            )}
-            <Input
-              label="Needed By"
-              type="date"
-              name="neededBy"
-              value={form.neededBy}
-              onChange={handleChange}
-            />
-            <Select
-              label="Priority"
-              name="priority"
-              value={form.priority}
-              onChange={handleChange}
-              options={priorities}
-            />
-          </Section>
-
-          <motion.button
-            type="submit"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-green-600 text-white py-3 px-6 rounded-md shadow-md w-full text-lg"
-          >
+          <motion.button type="submit" whileHover={{ scale:1.05 }} whileTap={{ scale:0.95 }} style={buttonStyle}>
             🚀 Submit Request
           </motion.button>
+
         </form>
       </motion.div>
     </motion.div>
   );
 };
-
-// Reusable Components
-const Section = ({ title, children }) => (
-  <div>
-    <h3 className="text-lg font-semibold text-gray-700 mb-3">{title}</h3>
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>
-  </div>
-);
-
-const Input = ({ label, name, value, onChange, type = 'text', required = false }) => (
-  <div className="flex flex-col">
-    <label className="text-gray-600 font-medium mb-1">{label}</label>
-    <input
-      type={type}
-      name={name}
-      value={value}
-      onChange={onChange}
-      required={required}
-      className="p-2 border border-gray-300 rounded-md"
-    />
-  </div>
-);
-
-const Textarea = ({ label, name, value, onChange, rows = 3, required = false }) => (
-  <div className="flex flex-col col-span-1 sm:col-span-2">
-    <label className="text-gray-600 font-medium mb-1">{label}</label>
-    <textarea
-      name={name}
-      value={value}
-      onChange={onChange}
-      rows={rows}
-      required={required}
-      className="p-2 border border-gray-300 rounded-md"
-    />
-  </div>
-);
-
-const Select = ({ label, name, value, onChange, options, required = false }) => (
-  <div className="flex flex-col">
-    <label className="text-gray-600 font-medium mb-1">{label}</label>
-    <select
-      name={name}
-      value={value}
-      onChange={onChange}
-      required={required}
-      className="p-2 border border-gray-300 rounded-md"
-    >
-      <option value="">Select {label}</option>
-      {options.map((opt) => (
-        <option key={opt} value={opt}>
-          {opt}
-        </option>
-      ))}
-    </select>
-  </div>
-);
 
 export default RequestHelp;

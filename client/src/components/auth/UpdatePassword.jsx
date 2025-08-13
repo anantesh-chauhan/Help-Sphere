@@ -21,7 +21,7 @@ const UpdatePassword = () => {
   });
 
   const handleSubmit = (values) => {
-    console.log('Updated Password:', values.password);
+    console.log('✅ Updated Password:', values.password);
     // Backend update password call here
   };
 
@@ -62,14 +62,11 @@ const UpdatePassword = () => {
             >
               <motion.div
                 variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
-                style={{
-                  textAlign: 'center',
-                  marginBottom: '24px',
-                }}
+                style={{ textAlign: 'center', marginBottom: '24px' }}
               >
                 <GrUpdate size={48} color="#1976d2" />
-                <h2 style={{ margin: '8px 0' }}>Update Password</h2>
-                <p style={{ color: '#666' }}>Enter your new password</p>
+                <h2 style={{ margin: '8px 0' }}>🔑 Update Password</h2>
+                <p style={{ color: '#666' }}>Enter your new password ✨</p>
               </motion.div>
 
               <motion.div
@@ -77,7 +74,7 @@ const UpdatePassword = () => {
               >
                 <TextField
                   name="password"
-                  label="New Password"
+                  label="New Password 🔒"
                   type={visible ? 'text' : 'password'}
                   fullWidth
                   margin="normal"
@@ -111,7 +108,7 @@ const UpdatePassword = () => {
                   size="large"
                   style={{ marginTop: '16px' }}
                 >
-                  Update Password
+                  💾 Update Password
                 </Button>
               </motion.div>
 
@@ -127,7 +124,7 @@ const UpdatePassword = () => {
                   onClick={() => navigate('/login')}
                   style={{ marginTop: '12px' }}
                 >
-                  Back to Login
+                  🔙 Back to Login
                 </Button>
               </motion.div>
             </motion.div>

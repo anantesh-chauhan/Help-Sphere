@@ -47,13 +47,13 @@ export default function AllUsersPage() {
         style={{
           textAlign: "center",
           padding: "40px",
-          fontSize: "1.1rem",
+          fontSize: "1.2rem",
           color: "#555",
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
-        Loading users...
+        ⏳ Loading users...
       </motion.div>
     );
   }
@@ -77,7 +77,7 @@ export default function AllUsersPage() {
           textAlign: "center",
         }}
       >
-        All Users
+        👥 All Users
       </h1>
       <motion.div
         style={{
@@ -89,10 +89,7 @@ export default function AllUsersPage() {
         animate="show"
         variants={{
           hidden: { opacity: 0 },
-          show: {
-            opacity: 1,
-            transition: { staggerChildren: 0.15 },
-          },
+          show: { opacity: 1, transition: { staggerChildren: 0.15 } },
         }}
       >
         {users.map((user) => (
@@ -105,39 +102,30 @@ export default function AllUsersPage() {
               padding: "20px",
               textAlign: "center",
             }}
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              show: { opacity: 1, y: 0 },
-            }}
+            variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
             whileHover={{ scale: 1.03 }}
           >
             <img
-              src={defaultAvatar}
+              src={user.avatar || defaultAvatar}
               alt={user.name || "User"}
               style={{
                 width: "100px",
                 height: "100px",
                 borderRadius: "50%",
                 objectFit: "cover",
+                marginBottom: "10px",
               }}
             />
             <h2
               style={{
                 fontSize: "1.2rem",
                 fontWeight: "600",
-                marginTop: "10px",
+                marginTop: "5px",
               }}
             >
-              {user.name}
+              {user.name} {user.friendStatus === "friend" && "💙"}
             </h2>
-            <p
-              style={{
-                fontSize: "0.9rem",
-                color: "#666",
-              }}
-            >
-              {user.email}
-            </p>
+            <p style={{ fontSize: "0.9rem", color: "#666" }}>📧 {user.email}</p>
 
             <div
               style={{
@@ -148,8 +136,8 @@ export default function AllUsersPage() {
                 color: "#555",
               }}
             >
-              <span>Donations: {user.donations ?? 0}</span>
-              <span>Helps: {user.helpRequests ?? 0}</span>
+              <span>💰 Donations: {user.donations ?? 0}</span>
+              <span>👐 Helps: {user.helpRequests ?? 0}</span>
             </div>
 
             <div style={{ marginTop: "15px" }}>
@@ -168,7 +156,7 @@ export default function AllUsersPage() {
                   whileHover={{ scale: 1.05, backgroundColor: "#218838" }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Add Friend
+                  ➕ Add Friend
                 </motion.button>
               )}
               {user.friendStatus === "pending" && (
@@ -185,7 +173,7 @@ export default function AllUsersPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
-                  Pending
+                  ⏳ Pending
                 </motion.span>
               )}
               {user.friendStatus === "friend" && (
@@ -202,7 +190,7 @@ export default function AllUsersPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
-                  Friends
+                  💖 Friends
                 </motion.span>
               )}
             </div>

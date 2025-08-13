@@ -9,6 +9,7 @@ const {
   rejectRequest,
   listFriends,
   unfriend,
+  cancelRequest,
   listUsers
 } = require('../controllers/friendController.js');
 
@@ -20,6 +21,7 @@ router.get('/incoming', auth, getIncoming);
 router.get('/outgoing', auth, getOutgoing);
 router.post('/accept/:requestId', auth, acceptRequest);
 router.post('/reject/:requestId', auth, rejectRequest);
+router.post('/cancel/:requestId', auth, cancelRequest);
 router.get('/', auth, listFriends);
 router.delete('/:friendId', auth, unfriend);
 

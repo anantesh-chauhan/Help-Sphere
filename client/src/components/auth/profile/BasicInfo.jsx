@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Avatar, Typography, Box } from '@mui/material';
+import { Avatar, Typography } from '@mui/material';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -14,22 +14,20 @@ const BasicInfo = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const data = {
-        url: apis().userProfile,
-        method: 'GET',
-      };
-
-      const result = await httpAction(data);
-
-      if (result?.success && result.user) {
-        handleLogin(result.user);
-        setUser(result.user);
-      } else {
-        toast.error(result?.message || 'Session expired');
+      try {
+        const result = await httpAction({ url: apis().userProfile, method: 'GET' });
+        if (result?.success && result.user) {
+          handleLogin(result.user);
+          setUser(result.user);
+        } else {
+          toast.error(result?.message || 'Session expired');
+          navigate('/login');
+        }
+      } catch (err) {
+        toast.error('Failed to fetch user info');
         navigate('/login');
       }
     };
-
     fetchUser();
   }, []);
 
@@ -51,44 +49,38 @@ const BasicInfo = () => {
       initial={{ opacity: 0, x: -15 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4 }}
+      style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}
     >
-      <Box
-        display="flex"
-        alignItems="center"
-        flexWrap="wrap"
-        gap={2}
-        sx={{ mb: 3 }}
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.2 }}
       >
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
+        <Avatar
+          style={{
+            width: '80px',
+            height: '80px',
+            backgroundColor: '#4caf50',
+            fontSize: '28px',
+          }}
         >
-          <Avatar
-            sx={{
-              width: 80,
-              height: 80,
-              bgcolor: '#4caf50',
-              fontSize: '28px',
-            }}
-          >
-            {user.name?.charAt(0)?.toUpperCase() || 'U'}
-          </Avatar>
-        </motion.div>
+           {user.name?.charAt(0)?.toUpperCase() || 'U'}
+        </Avatar>
+      </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Typography variant="h5" sx={{ mb: 0 }}>
-            {user.name}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            {user.email}
-          </Typography>
-        </motion.div>
-      </Box>
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        style={{ display: 'flex', flexDirection: 'column' }}
+      >
+        <Typography style={{ margin: 0, fontSize: '1.5rem', fontWeight: 600 }}>
+          👤 {user.name}
+        </Typography>
+        <Typography style={{ color: '#757575', fontSize: '0.9rem' }}>
+          ✉️ {user.email}
+        </Typography>
+      </motion.div>
     </motion.div>
   );
 };

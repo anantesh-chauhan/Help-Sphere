@@ -37,17 +37,17 @@ const DashboardStats = () => {
   }, []);
 
   const statItems = [
-    { label: 'Total Users', value: stats.totalUsers },
-    { label: 'Total Help-Requests', value: stats.totalRequests },
-    { label: 'Total Donations', value: stats.totalDonations },
-    { label: 'Total Reviews', value: stats.totalReviews },
-    { label: 'Active NGOs', value: stats.activeNGOs },
-    { label: 'Bug Reports', value: stats.bugReports },
-    { label: 'Help Offers', value: stats.helpOffers },
+    { label: '👥 Total Users', value: stats.totalUsers },
+    { label: '🆘 Total Help-Requests', value: stats.totalRequests },
+    { label: '💝 Total Donations', value: stats.totalDonations },
+    { label: '⭐ Total Reviews', value: stats.totalReviews },
+    { label: '🏢 Active NGOs', value: stats.activeNGOs },
+    { label: '🐞 Bug Reports', value: stats.bugReports },
+    { label: '🤝 Help Offers', value: stats.helpOffers },
   ];
 
   return (
-    <Box sx={{ p: isMobile ? 2 : 4 , backgroundColor: '#f3e5f5' }}>
+    <Box sx={{ p: isMobile ? 2 : 4, backgroundColor: '#f3e5f5' }}>
       <Typography
         variant="h5"
         sx={{
@@ -60,10 +60,17 @@ const DashboardStats = () => {
         📊 Platform Overview
       </Typography>
 
-      <Grid container spacing={3} sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 3 }}>
+      <Grid
+        container
+        spacing={3}
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
+          gap: 3,
+        }}
+      >
         {statItems.map((item, i) => (
-          <Grid item xs={12} sm={6} md={4} key={item.label} 
-          >
+          <Grid item xs={12} sm={6} md={4} key={item.label}>
             <motion.div
               custom={i}
               initial="hidden"

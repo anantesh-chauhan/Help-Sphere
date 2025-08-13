@@ -12,21 +12,16 @@ const PersonalDetails = () => {
 
   useEffect(() => {
     const fetchUserDetails = async () => {
-      const data = {
-        url: apis().userProfile,
-        method: 'GET',
-      };
-
+      const data = { url: apis().userProfile, method: 'GET' };
       const result = await httpAction(data);
 
       if (result?.success && result.user) {
         setUser(result.user);
         handleLogin?.(result.user);
       } else {
-        toast.error(result?.message || 'Failed to fetch personal details');
+        toast.error(result?.message || 'Failed to fetch personal details ❌');
       }
     };
-
     fetchUserDetails();
   }, []);
 
@@ -36,8 +31,9 @@ const PersonalDetails = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
+        style={{ textAlign: 'center', padding: '16px' }}
       >
-        <Typography variant="body1">Loading personal details...</Typography>
+        <Typography variant="body1">⏳ Loading personal details...</Typography>
       </motion.div>
     );
   }
@@ -48,14 +44,21 @@ const PersonalDetails = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Box sx={{ p: { xs: 2, sm: 3 }, backgroundColor: '#f9f9f9', borderRadius: 2 }}>
+      <Box
+        sx={{
+          p: { xs: 2, sm: 3 },
+          backgroundColor: '#f9f9f9',
+          borderRadius: 2,
+          boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+        }}
+      >
         <Typography variant="h6" gutterBottom>
-          Personal Information
+          📝 Personal Information
         </Typography>
-        <Typography><strong>Name:</strong> {user.name || 'N/A'}</Typography>
-        <Typography><strong>Email:</strong> {user.email || 'N/A'}</Typography>
-        <Typography><strong>Phone:</strong> {user.phone || 'N/A'}</Typography>
-        <Typography><strong>Address:</strong> {user.address || 'N/A'}</Typography>
+        <Typography>👤 <strong>Name:</strong> {user.name || 'N/A'}</Typography>
+        <Typography>📧 <strong>Email:</strong> {user.email || 'N/A'}</Typography>
+        <Typography>📱 <strong>Phone:</strong> {user.phone || 'N/A'}</Typography>
+        <Typography>🏠 <strong>Address:</strong> {user.address || 'N/A'}</Typography>
       </Box>
     </motion.div>
   );

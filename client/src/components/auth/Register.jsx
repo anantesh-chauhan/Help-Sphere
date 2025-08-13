@@ -9,12 +9,7 @@ import {
 import * as Yup from 'yup';
 import { Form, Formik } from 'formik';
 import { IoPersonAdd } from 'react-icons/io5';
-import {
-  ArrowBack,
-  Google,
-  Visibility,
-  VisibilityOff,
-} from '@mui/icons-material';
+import { ArrowBack, Google, Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import apis from '../../assets/utils/apis';
 import httpAction from '../../assets/utils/httpAction';
@@ -27,8 +22,7 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  const toggleConfirmPasswordVisibility = () =>
-    setShowConfirmPassword(!showConfirmPassword);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
   const initialState = {
     name: '',
@@ -45,16 +39,13 @@ const Register = () => {
   });
 
   const handleSubmit = async (values) => {
-    const data = {
-      url: apis().registerUser,
-      method: 'POST',
-      body: values,
-    };
-
+    const data = { url: apis().registerUser, method: 'POST', body: values };
     const result = await httpAction(data);
     if (result?.success) {
-      toast.success(result.message || 'Registration successful');
+      toast.success('✅ Registration successful!');
       navigate('/login');
+    } else {
+      toast.error('❌ Registration failed');
     }
   };
 
@@ -87,29 +78,19 @@ const Register = () => {
             <motion.div
               initial="hidden"
               animate="visible"
-              variants={{
-                visible: {
-                  transition: { staggerChildren: 0.1 },
-                },
-              }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
             >
               <motion.div
                 variants={{ hidden: { opacity: 0, y: -10 }, visible: { opacity: 1, y: 0 } }}
                 style={{ textAlign: 'center', marginBottom: '24px' }}
               >
                 <IoPersonAdd size={48} color="#1976d2" />
-                <h2 style={{ margin: '8px 0' }}>Register</h2>
-                <p style={{ color: '#666' }}>Create a new account</p>
+                <h2 style={{ margin: '8px 0' }}>📝 Register</h2>
+                <p style={{ color: '#666' }}>Create a new account ✨</p>
               </motion.div>
 
-              {[
-                { name: 'name', label: 'Name', type: 'text' },
-                { name: 'email', label: 'Email', type: 'email' },
-              ].map(({ name, label, type }) => (
-                <motion.div
-                  key={name}
-                  variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
-                >
+              {[{ name: 'name', label: 'Name 🧑', type: 'text' }, { name: 'email', label: 'Email 📧', type: 'email' }].map(({ name, label, type }) => (
+                <motion.div key={name} variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
                   <TextField
                     name={name}
                     label={label}
@@ -130,7 +111,7 @@ const Register = () => {
               <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
                 <TextField
                   name="password"
-                  label="Password"
+                  label="Password 🔒"
                   type={showPassword ? 'text' : 'password'}
                   fullWidth
                   variant="outlined"
@@ -156,7 +137,7 @@ const Register = () => {
               <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
                 <TextField
                   name="confirmPassword"
-                  label="Confirm Password"
+                  label="Confirm Password 🔒"
                   type={showConfirmPassword ? 'text' : 'password'}
                   fullWidth
                   variant="outlined"
@@ -180,7 +161,7 @@ const Register = () => {
 
               <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
                 <Button type="submit" variant="contained" fullWidth size="large" style={{ marginTop: '16px' }}>
-                  Register
+                  📝 Register
                 </Button>
               </motion.div>
 
@@ -197,7 +178,7 @@ const Register = () => {
                   onClick={() => (window.location.href = 'http://localhost:5050/auth/google')}
                   style={{ marginBottom: '12px' }}
                 >
-                  Register with Google
+                  🌎 Register with Google
                 </Button>
               </motion.div>
 
@@ -209,7 +190,7 @@ const Register = () => {
                   startIcon={<ArrowBack />}
                   onClick={() => navigate('/login')}
                 >
-                  Back to Login
+                  🔙 Back to Login
                 </Button>
               </motion.div>
             </motion.div>

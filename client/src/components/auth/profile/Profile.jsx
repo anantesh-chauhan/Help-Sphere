@@ -11,7 +11,7 @@ import ReportBug from './ReportBug';
 import { motion } from 'framer-motion';
 import HelpRequest from './HelpRequest';
 import Donations from './donatinons/Donations';
-
+import FriendsHub from '../../frineds/FriendsHub';
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('personal');
@@ -21,12 +21,13 @@ const Profile = () => {
       case 'personal': return <PersonalDetails />;
       case 'reviews': return <Reviews />;
       case 'donations': return <Donations />;
-      case 'requests': return  <HelpRequest />;
+      case 'requests': return <HelpRequest />;
       case 'claims': return <Claims />;
       case 'password': return <UpdatePassword />;
       case 'achievements': return <Achievements />;
       case 'logout': return <LogoutButton />;
       case 'bug-reports': return <ReportBug />;
+      case 'friends': return <FriendsHub />;
       default: return null;
     }
   };
@@ -58,7 +59,22 @@ const Profile = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
       >
-        <ProfileNav activeTab={activeTab} setActiveTab={setActiveTab} />
+        <ProfileNav 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          tabEmojis={{ // optional: pass emojis for each tab
+            personal: '📝',
+            reviews: '⭐',
+            donations: '💝',
+            requests: '📢',
+            claims: '📄',
+            password: '🔒',
+            achievements: '🏆',
+            logout: '🚪',
+            'bug-reports': '🐞',
+            friends: '👥',
+          }}
+        />
       </motion.div>
 
       <motion.div

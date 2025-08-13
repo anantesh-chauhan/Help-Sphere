@@ -248,3 +248,30 @@ exports.unfriend = async (req, res) => {
   await User.findByIdAndUpdate(friendId, { $pull: { friends: req.user.id } });
   res.json({ message: 'Unfriended' });
 };
+
+// Cancel a sent friend request
+exports.cancelRequest = async (req, res) => {
+  try {
+    const { requestId } = req.params;
+
+    // Find pending request sent by current user
+    const fr = await FriendRequest.findOne({
+      _id: requestId,
+      from: req.user.id,
+      status: 'pending'
+    });
+
+    if (!fr) {
+      return res.status(404).json({ message: 'Friend request not found or already processed' });
+    }
+
+    // Remove request
+    await fr.deleteOne();
+
+    res.json({ message: 'Friend request cancelled successfully' });
+  } catch (error) {
+    console.error('Error cancelling friend request:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+

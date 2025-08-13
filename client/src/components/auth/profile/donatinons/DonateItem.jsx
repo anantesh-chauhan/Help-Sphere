@@ -1,14 +1,91 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
+import { motion } from "framer-motion";
 import { AppContent } from "../../../../context/AppContext";
 import { toast } from "react-toastify";
 
-const DonateItem = () => {
-    const { backendUrl, userData } = useContext(AppContent);
+const containerVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
-    const [file, setFile] = useState(null);
-    const [imageUrl, setImageUrl] = useState("");
-    const [formData, setFormData] = useState({
+const fieldVariants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: (i) => ({
+    opacity: 1,
+    x: 0,
+    transition: { delay: i * 0.05 },
+  }),
+};
+
+const DonateItem = () => {
+  const { backendUrl } = useContext(AppContent);
+  const [file, setFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    category: "",
+    quantity: "",
+    expiryDate: "",
+    isPerishable: false,
+    cookedAt: "",
+    storageInfo: "",
+    isVeg: true,
+    foodType: "",
+    allergens: "",
+    size: "",
+    color: "",
+    gender: "",
+    brand: "",
+    isWorking: true,
+    powerRequirement: "",
+    pickupAddress: "",
+    contactNumber: "",
+    canDeliver: false,
+  });
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!file) return toast.error("📷 Please select a file first.");
+    const data = new FormData();
+    data.append("file", file);
+
+    try {
+      const res = await axios.post(`${backendUrl}/upload`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success("✅ Image uploaded successfully");
+      setImageUrl(res.data.url);
+    } catch (err) {
+      toast.error("❌ Image upload failed");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!imageUrl) return toast.error("📤 Upload image first");
+
+    const payload = {
+      ...formData,
+      imageUrls: [imageUrl],
+      allergens: formData.allergens
+        ? formData.allergens.split(",").map((a) => a.trim())
+        : [],
+    };
+
+    Object.keys(payload).forEach((key) => {
+      if (payload[key] === "" || payload[key] === null) {
+        delete payload[key];
+      }
+    });
+
+    try {
+      await axios.post(`${backendUrl}/api/items/create`, payload, {
+        withCredentials: true,
+      });
+      toast.success("🎁 Item donated successfully");
+      setFormData({
         title: "",
         description: "",
         category: "",
@@ -29,260 +106,176 @@ const DonateItem = () => {
         pickupAddress: "",
         contactNumber: "",
         canDeliver: false,
-    });
+      });
+      setImageUrl("");
+      setFile(null);
+    } catch {
+      toast.error("⚠️ Failed to donate item. Are you logged in?");
+    }
+  };
 
-    const handleUpload = async (e) => {
-        e.preventDefault();
-        if (!file) return toast.error("Please select a file first.");
+  return (
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      style={{
+        maxWidth: "800px",
+        margin: "auto",
+        padding: "20px",
+        borderRadius: "10px",
+        background: "#fff",
+        boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
+      }}
+    >
+      <motion.h1
+        style={{
+          fontSize: "1.8rem",
+          fontWeight: "bold",
+          marginBottom: "20px",
+          color: "#2e7d32",
+        }}
+      >
+        🎁 Donate an Item
+      </motion.h1>
 
-        const data = new FormData();
-        data.append("file", file);
+      {/* Upload Form */}
+      <form onSubmit={handleUpload} style={{ marginBottom: "20px" }}>
+        <label style={{ fontWeight: "bold", display: "block" }}>
+          📷 Upload Item Image
+        </label>
+        <input
+          type="file"
+          onChange={(e) => setFile(e.target.files[0])}
+          style={{ marginTop: "8px" }}
+        />
+        <button
+          type="submit"
+          style={{
+            marginLeft: "10px",
+            background: "#2e7d32",
+            color: "#fff",
+            padding: "6px 14px",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          ⬆️ Upload Image
+        </button>
+        {imageUrl && (
+          <div style={{ marginTop: "10px" }}>
+            <img
+              src={imageUrl}
+              alt="Uploaded"
+              style={{ maxWidth: "100%", height: "200px", borderRadius: "5px" }}
+            />
+          </div>
+        )}
+      </form>
 
-        try {
-            const res = await axios.post(`${backendUrl}/upload`, data, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-            toast.success("Image uploaded successfully");
-            setImageUrl(res.data.url);
-        } catch (err) {
-            console.error("Upload error", err);
-            toast.error("Image upload failed");
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!imageUrl) return toast.error("Upload image first");
-
-        // Prepare payload
-        const payload = {
-            ...formData,
-            imageUrls: [imageUrl],
-            allergens: formData.allergens
-                ? formData.allergens.split(",").map((a) => a.trim())
-                : [],
-        };
-
-        // Remove empty string or null/undefined fields
-        Object.keys(payload).forEach((key) => {
-            if (payload[key] === "" || payload[key] === null || payload[key] === undefined) {
-                delete payload[key];
+      {/* Donation Form */}
+      <form onSubmit={handleSubmit} style={{ display: "grid", gap: "10px" }}>
+        {[
+          { placeholder: "🏷️ Title", key: "title", type: "text", required: true },
+          {
+            placeholder: "📦 Quantity",
+            key: "quantity",
+            type: "text",
+            required: true,
+          },
+        ].map((field, i) => (
+          <motion.input
+            key={field.key}
+            variants={fieldVariants}
+            custom={i}
+            initial="hidden"
+            animate="visible"
+            type={field.type}
+            placeholder={field.placeholder}
+            required={field.required}
+            value={formData[field.key]}
+            onChange={(e) =>
+              setFormData({ ...formData, [field.key]: e.target.value })
             }
-        });
+            style={{
+              padding: "8px",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+            }}
+          />
+        ))}
 
-        try {
-            const res = await axios.post(`${backendUrl}/api/items/create`, payload, {
-                withCredentials: true,
-            });
+        <motion.textarea
+          variants={fieldVariants}
+          custom={3}
+          initial="hidden"
+          animate="visible"
+          placeholder="🖋️ Description"
+          required
+          value={formData.description}
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
+          style={{
+            padding: "8px",
+            border: "1px solid #ccc",
+            borderRadius: "5px",
+            minHeight: "80px",
+          }}
+        />
 
-            toast.success("Item donated successfully");
-            setFormData({
-                title: "",
-                description: "",
-                category: "",
-                quantity: "",
-                expiryDate: "",
-                isPerishable: false,
-                cookedAt: "",
-                storageInfo: "",
-                isVeg: true,
-                foodType: "",
-                allergens: "",
-                size: "",
-                color: "",
-                gender: "",
-                brand: "",
-                isWorking: true,
-                powerRequirement: "",
-                pickupAddress: "",
-                contactNumber: "",
-                canDeliver: false,
-            });
-            setImageUrl("");
-            setFile(null);
-        } catch (err) {
-            console.error("Submit error", err);
-            toast.error("Failed to donate item. Are you logged in?");
-        }
-    };
+        {/* Category Select */}
+        <motion.select
+          variants={fieldVariants}
+          custom={4}
+          initial="hidden"
+          animate="visible"
+          required
+          value={formData.category}
+          onChange={(e) =>
+            setFormData({ ...formData, category: e.target.value })
+          }
+          style={{
+            padding: "8px",
+            border: "1px solid #ccc",
+            borderRadius: "5px",
+          }}
+        >
+          <option value="">📂 Select Category</option>
+          <option value="food">🍲 Food</option>
+          <option value="clothes">👕 Clothes</option>
+          <option value="books">📚 Books</option>
+          <option value="toys">🧸 Toys</option>
+          <option value="electronics">💻 Electronics</option>
+          <option value="furniture">🛋️ Furniture</option>
+          <option value="household">🏠 Household</option>
+          <option value="others">✨ Others</option>
+        </motion.select>
 
-    return (
-        <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow-md">
-            <h1 className="text-2xl font-bold mb-4 text-green-700">Donate an Item</h1>
-
-            {/* Image Upload */}
-            <form onSubmit={handleUpload} className="mb-6">
-                <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-                <button type="submit" className="ml-4 bg-green-600 text-white px-4 py-2 rounded">
-                    Upload Image
-                </button>
-                {imageUrl && (
-                    <div className="mt-4">
-                        <img
-                            src={imageUrl}
-                            alt="Uploaded Item"
-                            style={{ maxWidth: "100%", height: "35vh" }} />
-                        {/* <p className="text-blue-500 mt-2 break-words">{imageUrl}</p> */}
-                    </div>
-                )}
-            </form>
-
-            {/* Donation Form */}
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input placeholder="Title" value={formData.title} required
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="p-2 border rounded"
-                />
-                <input placeholder="Quantity (e.g., 2 kg, 5 items)" required
-                    value={formData.quantity}
-                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                    className="p-2 border rounded"
-                />
-                <textarea placeholder="Description" required
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="p-2 border rounded col-span-full"
-                />
-                <select
-                    required
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="p-2 border rounded"
-                >
-                    <option value="">Select Category</option>
-                    <option value="food">Food</option>
-                    <option value="clothes">Clothes</option>
-                    <option value="books">Books</option>
-                    <option value="toys">Toys</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="furniture">Furniture</option>
-                    <option value="household">Household</option>
-                    <option value="others">Others</option>
-                </select>
-
-                {/* Dynamic Fields */}
-                {formData.category === "food" && (
-                    <>
-                        <input type="datetime-local" value={formData.cookedAt}
-                            onChange={(e) => setFormData({ ...formData, cookedAt: e.target.value })}
-                            className="p-2 border rounded"
-                            placeholder="Cooked At"
-                        />
-                        <input type="date" value={formData.expiryDate}
-                            onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
-                            className="p-2 border rounded"
-                            placeholder="Expiry Date"
-                        />
-                        <input
-                            type="text"
-                            placeholder="Food Type (dry/cooked/packaged)"
-                            value={formData.foodType}
-                            onChange={(e) => setFormData({ ...formData, foodType: e.target.value })}
-                            className="p-2 border rounded"
-                        />
-                        <input
-                            type="text"
-                            placeholder="Allergens (comma separated)"
-                            value={formData.allergens}
-                            onChange={(e) => setFormData({ ...formData, allergens: e.target.value })}
-                            className="p-2 border rounded col-span-full"
-                        />
-                        <input
-                            type="text"
-                            placeholder="Storage Info"
-                            value={formData.storageInfo}
-                            onChange={(e) => setFormData({ ...formData, storageInfo: e.target.value })}
-                            className="p-2 border rounded"
-                        />
-                        <label className="flex items-center gap-2">
-                            <input type="checkbox"
-                                checked={formData.isPerishable}
-                                onChange={(e) => setFormData({ ...formData, isPerishable: e.target.checked })}
-                            />
-                            Is Perishable?
-                        </label>
-                        <label className="flex items-center gap-2">
-                            <input type="checkbox"
-                                checked={formData.isVeg}
-                                onChange={(e) => setFormData({ ...formData, isVeg: e.target.checked })}
-                            />
-                            Vegetarian?
-                        </label>
-                    </>
-                )}
-
-                {formData.category === "clothes" && (
-                    <>
-                        <input placeholder="Size (S/M/L/XL)"
-                            value={formData.size}
-                            onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                            className="p-2 border rounded"
-                        />
-                        <input placeholder="Color"
-                            value={formData.color}
-                            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                            className="p-2 border rounded"
-                        />
-                        <select
-                            value={formData.gender}
-                            onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                            className="p-2 border rounded"
-                        >
-                            <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="unisex">Unisex</option>
-                        </select>
-                    </>
-                )}
-
-                {formData.category === "electronics" && (
-                    <>
-                        <input placeholder="Brand"
-                            value={formData.brand}
-                            onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                            className="p-2 border rounded"
-                        />
-                        <input placeholder="Power Requirement"
-                            value={formData.powerRequirement}
-                            onChange={(e) => setFormData({ ...formData, powerRequirement: e.target.value })}
-                            className="p-2 border rounded"
-                        />
-                        <label className="flex items-center gap-2">
-                            <input type="checkbox"
-                                checked={formData.isWorking}
-                                onChange={(e) => setFormData({ ...formData, isWorking: e.target.checked })}
-                            />
-                            Is Working?
-                        </label>
-                    </>
-                )}
-
-                {/* Common Pickup Fields */}
-                <input placeholder="Pickup Address"
-                    value={formData.pickupAddress}
-                    onChange={(e) => setFormData({ ...formData, pickupAddress: e.target.value })}
-                    className="p-2 border rounded col-span-full"
-                />
-                <input placeholder="Contact Number"
-                    value={formData.contactNumber}
-                    onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
-                    className="p-2 border rounded"
-                />
-                <label className="flex items-center gap-2 col-span-full">
-                    <input type="checkbox"
-                        checked={formData.canDeliver}
-                        onChange={(e) => setFormData({ ...formData, canDeliver: e.target.checked })}
-                    />
-                    I can deliver this item
-                </label>
-
-                <button type="submit" className="bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700 col-span-full mt-2">
-                    Submit Donation
-                </button>
-            </form>
-        </div>
-    );
+        {/* Submit */}
+        <motion.button
+          variants={fieldVariants}
+          custom={5}
+          initial="hidden"
+          animate="visible"
+          type="submit"
+          style={{
+            marginTop: "10px",
+            background: "#f9a825",
+            color: "#fff",
+            padding: "10px",
+            fontWeight: "bold",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          ✅ Submit Donation
+        </motion.button>
+      </form>
+    </motion.div>
+  );
 };
 
 export default DonateItem;

@@ -17,9 +17,10 @@ const LogoutButton = ({ fullWidth = true }) => {
 
     if (result?.success) {
       setLogout?.();
+      toast.success('👋 Logged out successfully');
       navigate('/login');
     } else {
-      toast.error(result?.message || 'Logout failed');
+      toast.error(result?.message || 'Logout failed ❌');
     }
   };
 
@@ -33,7 +34,10 @@ const LogoutButton = ({ fullWidth = true }) => {
       <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
         <Button
           variant="contained"
-          style={{ backgroundColor: '#eba645', color: 'white' }}
+          style={{
+            backgroundColor: '#eba645',
+            color: 'white',
+          }}
           onClick={handleLogout}
           endIcon={<Logout />}
           fullWidth={fullWidth}
@@ -42,10 +46,9 @@ const LogoutButton = ({ fullWidth = true }) => {
             fontWeight: 600,
             textTransform: 'capitalize',
             fontSize: '1rem',
-
           }}
         >
-          Logout
+          🚪 Logout
         </Button>
       </motion.div>
     </motion.div>

@@ -1,25 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Button,
-  Rating,
-  Box,
-  Typography,
-  TextField,
-  Avatar,
-  useMediaQuery,
-} from '@mui/material';
 import { toast } from 'react-toastify';
 import moment from 'moment';
+import { motion, AnimatePresence } from 'framer-motion';
 import apis from '../../../../assets/utils/apis';
 import httpAction from '../../../../assets/utils/httpAction';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const MyReviews = () => {
   const [reviews, setReviews] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editedContent, setEditedContent] = useState('');
   const [editedRating, setEditedRating] = useState(5);
-  const isMobile = useMediaQuery('(max-width:600px)');
 
   const fetchReviews = async () => {
     const data = { url: apis().getMyReviews, method: 'GET' };
@@ -64,132 +54,93 @@ const MyReviews = () => {
     }
   };
 
+  const containerStyle = { padding: 20, maxWidth: 800, margin: '0 auto' };
+  const cardStyle = { marginBottom: 20, padding: 16, borderRadius: 12, background: '#f9f9f9', boxShadow: '0 2px 6px rgba(0,0,0,0.05)' };
+  const avatarStyle = { width:40, height:40, borderRadius:'50%', background:'#bbb', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:'bold', fontSize:16 };
+  const buttonStyle = { padding:'6px 12px', borderRadius:6, border:'none', cursor:'pointer', fontSize:14 };
+  const saveBtnStyle = { ...buttonStyle, background:'#4CAF50', color:'#fff' };
+  const cancelBtnStyle = { ...buttonStyle, background:'#ccc', color:'#000' };
+  const editBtnStyle = { ...buttonStyle, background:'#2196F3', color:'#fff' };
+  const deleteBtnStyle = { ...buttonStyle, background:'#f44336', color:'#fff' };
+  const inputStyle = { width:'100%', padding:8, borderRadius:6, border:'1px solid #ccc', marginBottom:8 };
+
   return (
-    <Box sx={{ padding: isMobile ? '1rem' : '2rem' }}>
+    <div style={containerStyle}>
       <motion.h2
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        style={{
-          fontSize: isMobile ? '1.4rem' : '2rem',
-          marginBottom: '1rem',
-          fontWeight: 600,
-          textAlign: 'center',
-        }}
+        initial={{ opacity:0, y:-10 }}
+        animate={{ opacity:1, y:0 }}
+        transition={{ duration:0.4 }}
+        style={{ fontSize:24, fontWeight:600, marginBottom:20, textAlign:'center' }}
       >
         My Reviews
       </motion.h2>
 
       <AnimatePresence>
         {reviews.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{ textAlign: 'center' }}
-          >
-            <Typography variant="body1" color="text.secondary">
-              You haven't written any reviews yet.
-            </Typography>
+          <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} style={{ textAlign:'center' }}>
+            <p style={{ color:'#555' }}>You haven't written any reviews yet.</p>
           </motion.div>
         ) : (
-          reviews.map((rev) =>
+          reviews.map(rev =>
             rev && rev._id ? (
               <motion.div
                 key={rev._id}
                 layout
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                style={{
-                  marginBottom: '1.5rem',
-                  padding: '1rem',
-                  borderRadius: '12px',
-                  background: '#f9f9f9',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
-                }}
+                initial={{ opacity:0, y:10 }}
+                animate={{ opacity:1, y:0 }}
+                exit={{ opacity:0, y:-10 }}
+                transition={{ duration:0.2 }}
+                style={cardStyle}
               >
                 {/* Header */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Avatar>{rev.user?.name?.charAt(0) || 'U'}</Avatar>
-                  <Box>
-                    <Typography sx={{ fontWeight: 600 }}>
-                      {rev.user?.name || 'You'}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'gray' }}>
-                      {moment(rev.createdAt).fromNow()}
-                    </Typography>
-                  </Box>
-                </Box>
+                <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:8 }}>
+                  <div style={avatarStyle}>{rev.user?.name?.charAt(0) || 'U'}</div>
+                  <div>
+                    <div style={{ fontWeight:600 }}>{rev.user?.name || 'You'}</div>
+                    <div style={{ fontSize:12, color:'gray' }}>{moment(rev.createdAt).fromNow()}</div>
+                  </div>
+                </div>
 
-                {/* Editable or Static Content */}
-                <Box sx={{ mt: 1 }}>
-                  {editingId === rev._id ? (
-                    <>
-                      <TextField
-                        fullWidth
-                        multiline
-                        rows={2}
-                        value={editedContent || ''}
-                        onChange={(e) => setEditedContent(e.target.value)}
-                        sx={{ mb: 1 }}
+                {/* Content */}
+                {editingId === rev._id ? (
+                  <div>
+                    <textarea
+                      value={editedContent || ''}
+                      onChange={(e) => setEditedContent(e.target.value)}
+                      rows={3}
+                      style={inputStyle}
+                    />
+                    <div style={{ marginBottom:8 }}>
+                      <label>Rating: </label>
+                      <input
+                        type="number"
+                        min={1} max={5}
+                        value={editedRating}
+                        onChange={(e) => setEditedRating(Number(e.target.value))}
+                        style={{ width:50, padding:4, marginLeft:8 }}
                       />
-                      <Rating
-                        value={editedRating || 0}
-                        onChange={(e, val) => setEditedRating(val)}
-                        sx={{ mb: 1 }}
-                      />
-                      <Box display="flex" gap={1} flexWrap="wrap">
-                        <Button variant="contained" onClick={() => handleEdit(rev._id)}>
-                          Save
-                        </Button>
-                        <Button variant="outlined" onClick={() => setEditingId(null)}>
-                          Cancel
-                        </Button>
-                      </Box>
-                    </>
-                  ) : (
-                    <>
-                      <Typography sx={{ mt: 1, wordBreak: 'break-word' }}>
-                        {rev.content || 'No content provided.'}
-                      </Typography>
-                      <Rating
-                        value={rev.rating || 0}
-                        readOnly
-                        size="small"
-                        sx={{ mt: 1 }}
-                      />
-                      <Box display="flex" gap={1} mt={1} flexWrap="wrap">
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() => {
-                            setEditingId(rev._id);
-                            setEditedContent(rev.content || '');
-                            setEditedRating(rev.rating || 0);
-                          }}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          size="small"
-                          onClick={() => handleDelete(rev._id)}
-                        >
-                          Delete
-                        </Button>
-                      </Box>
-                    </>
-                  )}
-                </Box>
+                    </div>
+                    <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                      <button style={saveBtnStyle} onClick={() => handleEdit(rev._id)}>Save</button>
+                      <button style={cancelBtnStyle} onClick={() => setEditingId(null)}>Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <p style={{ marginTop:4, marginBottom:8, wordBreak:'break-word' }}>{rev.content || 'No content provided.'}</p>
+                    <p style={{ marginBottom:8 }}>Rating: {rev.rating || 0} / 5</p>
+                    <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                      <button style={editBtnStyle} onClick={() => { setEditingId(rev._id); setEditedContent(rev.content || ''); setEditedRating(rev.rating || 5); }}>Edit</button>
+                      <button style={deleteBtnStyle} onClick={() => handleDelete(rev._id)}>Delete</button>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             ) : null
           )
         )}
       </AnimatePresence>
-    </Box>
+    </div>
   );
 };
 

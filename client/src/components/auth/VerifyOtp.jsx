@@ -55,7 +55,7 @@ const VerifyOtp = () => {
 
   const handleSubmit = (values) => {
     const otp = otpFields.map(field => values[field]).join('');
-    console.log('Submitted OTP:', otp);
+    console.log('✅ Submitted OTP:', otp);
     // Call your verify API here
   };
 
@@ -93,19 +93,14 @@ const VerifyOtp = () => {
             <motion.div
               initial="hidden"
               animate="visible"
-              variants={{
-                visible: { transition: { staggerChildren: 0.1 } },
-              }}
+              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
             >
               <motion.div
                 variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
-                style={{
-                  textAlign: 'center',
-                  marginBottom: '24px',
-                }}
+                style={{ textAlign: 'center', marginBottom: '24px' }}
               >
-                <h2 style={{ margin: '0 0 8px' }}>Verify OTP</h2>
-                <p style={{ color: '#555' }}>Enter the OTP sent to your email</p>
+                <h2 style={{ margin: '0 0 8px' }}>🔐 Verify OTP</h2>
+                <p style={{ color: '#555' }}>Enter the OTP sent to your email ✉️</p>
               </motion.div>
 
               <div
@@ -151,9 +146,7 @@ const VerifyOtp = () => {
                 ))}
               </div>
 
-              <motion.div
-                variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
-              >
+              <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
                 <Button
                   type="submit"
                   variant="contained"
@@ -162,13 +155,11 @@ const VerifyOtp = () => {
                   size="large"
                   disabled={Object.values(values).some(val => !val)}
                 >
-                  Verify OTP
+                  ✅ Verify OTP
                 </Button>
               </motion.div>
 
-              <motion.div
-                variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
-              >
+              <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
                 <Button
                   variant="outlined"
                   color="secondary"
@@ -178,7 +169,7 @@ const VerifyOtp = () => {
                   startIcon={<ArrowBack />}
                   onClick={() => navigate('/login')}
                 >
-                  Back to Login
+                  🔙 Back to Login
                 </Button>
               </motion.div>
 
@@ -190,10 +181,10 @@ const VerifyOtp = () => {
                   date={Date.now() + 60 * 1000}
                   renderer={({ minutes, seconds, completed }) =>
                     completed ? (
-                      <Button variant="text" size="small">Resend OTP</Button>
+                      <Button variant="text" size="small">🔄 Resend OTP</Button>
                     ) : (
                       <span style={{ color: '#555' }}>
-                        Resend OTP in {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+                        ⏳ Resend OTP in {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
                       </span>
                     )
                   }

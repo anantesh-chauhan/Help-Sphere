@@ -2,12 +2,14 @@ import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AppContent } from "../../../../context/AppContext";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion"; // ✅ import framer motion
 
 const ViewDonations = () => {
   const { backendUrl, userData } = useContext(AppContent);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetch all unclaimed donations
   const fetchItems = async () => {
     try {
       const res = await axios.get(`${backendUrl}/api/items/unclaimed`, {
@@ -22,6 +24,7 @@ const ViewDonations = () => {
     }
   };
 
+  // Handle item claim
   const handleClaim = async (itemId) => {
     if (!userData) {
       toast.warn("Please login to claim this item");
@@ -35,7 +38,7 @@ const ViewDonations = () => {
         { withCredentials: true }
       );
       toast.success("Item claimed successfully");
-      fetchItems(); // Refresh the list
+      fetchItems(); // Refresh after claim
     } catch (err) {
       console.error("Claim error", err);
       toast.error("Failed to claim item");
@@ -46,131 +49,159 @@ const ViewDonations = () => {
     fetchItems();
   }, []);
 
-  const styles = {
-    container: {
-      maxWidth: "1000px",
-      margin: "0 auto",
-      padding: "1rem",
-    },
-    card: {
-      border: "1px solid #ccc",
-      borderRadius: "8px",
-      padding: "1rem",
-      marginBottom: "1.5rem",
-      background: "#fefefe",
-      display: "flex",
-      flexDirection: "column",
-      gap: "0.5rem",
-    },
-    image: {
-      maxHeight: "200px",
-      width: "100%",
-      objectFit: "cover",
-      borderRadius: "6px",
-    },
-    claimBtn: {
-      backgroundColor: "#4CAF50",
-      color: "#fff",
-      border: "none",
-      padding: "0.5rem 1rem",
-      borderRadius: "5px",
-      cursor: "pointer",
-      fontWeight: "bold",
-      marginTop: "0.5rem",
-    },
-    heading: {
-      fontSize: "1.5rem",
-      fontWeight: "bold",
-      marginBottom: "1rem",
-      textAlign: "center",
-      color: "#333",
-    },
-    label: {
-      fontWeight: "bold",
-      color: "#444",
-    },
-    section: {
-      marginTop: "0.25rem",
-    },
-  };
-
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>Available Donations</h2>
+    <div className="max-w-5xl mx-auto p-4">
+      <h2 className="text-2xl font-bold text-center mb-6 text-green-700">
+        Available Donations
+      </h2>
 
       {loading ? (
-        <p>Loading donations...</p>
+        <p className="text-center text-gray-600">Loading donations...</p>
       ) : items.length === 0 ? (
-        <p>No items available for donation at the moment.</p>
+        <p className="text-center text-gray-500">
+          No items available for donation at the moment.
+        </p>
       ) : (
-        items.map((item) => (
-          <div key={item._id} style={styles.card}>
+        items.map((item, index) => (
+          <motion.div
+            key={item._id}
+            className="border border-gray-300 rounded-lg bg-white shadow-md p-4 mb-6"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1, duration: 0.4 }}
+          >
+            {/* Animated Image */}
             {item.imageUrls?.length > 0 && (
-              <img src={item.imageUrls[0]} alt={item.title} style={styles.image} />
+              <motion.img
+                src={item.imageUrls[0]}
+                alt={item.title}
+                className="w-full object-contain rounded-md mb-3 bg-gray-100"
+                style={{ height: "250px" }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                whileHover={{ scale: 1.05 }}
+              />
             )}
-            <h3>{item.title}</h3>
-            <p style={styles.section}><span style={styles.label}>Description:</span> {item.description}</p>
-            <p style={styles.section}><span style={styles.label}>Category:</span> {item.category}</p>
-            <p style={styles.section}><span style={styles.label}>Quantity:</span> {item.quantity}</p>
-            <p style={styles.section}><span style={styles.label}>Pickup Address:</span> {item.pickupAddress}</p>
-            <p style={styles.section}><span style={styles.label}>Contact:</span> {item.contactNumber}</p>
 
-            {/* Food-specific details */}
+            {/* Title & Basic Info */}
+            <h3 className="text-lg font-semibold text-green-800">
+              {item.title}
+            </h3>
+            <p className="text-gray-700">
+              <strong>Description:</strong> {item.description}
+            </p>
+            <p className="text-gray-700">
+              <strong>Category:</strong> {item.category}
+            </p>
+            <p className="text-gray-700">
+              <strong>Quantity:</strong> {item.quantity}
+            </p>
+            <p className="text-gray-700">
+              <strong>Pickup Address:</strong> {item.pickupAddress}
+            </p>
+            <p className="text-gray-700">
+              <strong>Contact:</strong> {item.contactNumber}
+            </p>
+
+            {/* Category-specific fields */}
             {item.category === "food" && (
               <>
                 {item.expiryDate && (
-                  <p style={styles.section}>
-                    <span style={styles.label}>Expiry Date:</span> {new Date(item.expiryDate).toLocaleDateString()}
+                  <p className="text-gray-700">
+                    <strong>Expiry Date:</strong>{" "}
+                    {new Date(item.expiryDate).toLocaleDateString()}
                   </p>
                 )}
                 {item.cookedAt && (
-                  <p style={styles.section}>
-                    <span style={styles.label}>Cooked At:</span> {new Date(item.cookedAt).toLocaleString()}
+                  <p className="text-gray-700">
+                    <strong>Cooked At:</strong>{" "}
+                    {new Date(item.cookedAt).toLocaleString()}
                   </p>
                 )}
                 {item.foodType && (
-                  <p style={styles.section}><span style={styles.label}>Food Type:</span> {item.foodType}</p>
+                  <p className="text-gray-700">
+                    <strong>Food Type:</strong> {item.foodType}
+                  </p>
                 )}
                 {item.storageInfo && (
-                  <p style={styles.section}><span style={styles.label}>Storage Info:</span> {item.storageInfo}</p>
+                  <p className="text-gray-700">
+                    <strong>Storage Info:</strong> {item.storageInfo}
+                  </p>
                 )}
-                <p style={styles.section}><span style={styles.label}>Perishable:</span> {item.isPerishable ? "Yes" : "No"}</p>
-                <p style={styles.section}><span style={styles.label}>Vegetarian:</span> {item.isVeg ? "Yes" : "No"}</p>
+                <p className="text-gray-700">
+                  <strong>Perishable:</strong> {item.isPerishable ? "Yes" : "No"}
+                </p>
+                <p className="text-gray-700">
+                  <strong>Vegetarian:</strong> {item.isVeg ? "Yes" : "No"}
+                </p>
                 {item.allergens?.length > 0 && (
-                  <p style={styles.section}><span style={styles.label}>Allergens:</span> {item.allergens.join(", ")}</p>
+                  <p className="text-gray-700">
+                    <strong>Allergens:</strong> {item.allergens.join(", ")}
+                  </p>
                 )}
               </>
             )}
 
-            {/* Clothes-specific details */}
             {item.category === "clothes" && (
               <>
-                <p style={styles.section}><span style={styles.label}>Size:</span> {item.size}</p>
-                <p style={styles.section}><span style={styles.label}>Color:</span> {item.color}</p>
-                <p style={styles.section}><span style={styles.label}>Gender:</span> {item.gender}</p>
+                <p className="text-gray-700">
+                  <strong>Size:</strong> {item.size}
+                </p>
+                <p className="text-gray-700">
+                  <strong>Color:</strong> {item.color}
+                </p>
+                <p className="text-gray-700">
+                  <strong>Gender:</strong> {item.gender}
+                </p>
               </>
             )}
 
-            {/* Electronics-specific details */}
             {item.category === "electronics" && (
               <>
-                <p style={styles.section}><span style={styles.label}>Brand:</span> {item.brand}</p>
-                <p style={styles.section}><span style={styles.label}>Power Requirement:</span> {item.powerRequirement}</p>
-                <p style={styles.section}><span style={styles.label}>Working:</span> {item.isWorking ? "Yes" : "No"}</p>
+                <p className="text-gray-700">
+                  <strong>Brand:</strong> {item.brand}
+                </p>
+                <p className="text-gray-700">
+                  <strong>Power Requirement:</strong> {item.powerRequirement}
+                </p>
+                <p className="text-gray-700">
+                  <strong>Working:</strong> {item.isWorking ? "Yes" : "No"}
+                </p>
               </>
             )}
 
-            {/* Common field */}
-            <p style={styles.section}><span style={styles.label}>Can Deliver:</span> {item.canDeliver ? "Yes" : "No"}</p>
+            {/* Common Field */}
+            <p className="text-gray-700">
+              <strong>Can Deliver:</strong> {item.canDeliver ? "Yes" : "No"}
+            </p>
 
+            {/* Claim Button */}
             {userData ? (
-              <button onClick={() => handleClaim(item._id)} style={styles.claimBtn}>
+              <motion.button
+                onClick={() => handleClaim(item._id)}
+                style={{
+                  backgroundColor: "#16a34a", // green-600
+                  color: "#ffffff",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "0.375rem",
+                  marginTop: "0.75rem",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "background-color 0.3s ease"
+                }}
+                whileHover={{ scale: 1.05, backgroundColor: "#15803d" }} // green-700 on hover
+                whileTap={{ scale: 0.95 }}
+              >
                 Claim
-              </button>
+              </motion.button>
             ) : (
-              <p style={{ color: "red", marginTop: "0.5rem" }}>Login to claim this item</p>
+              <p style={{ color: "#b91c1c", marginTop: "0.5rem" }}>
+                Login to claim this item
+              </p>
             )}
-          </div>
+
+          </motion.div>
         ))
       )}
     </div>

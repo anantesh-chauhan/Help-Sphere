@@ -2,18 +2,19 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const tabs = [
-  { id: 'personal', label: 'Personal Details' },
-  { id: 'reviews', label: 'Reviews' },
-  { id: 'donations', label: 'Donations' },
-  { id: 'requests', label: 'Help Requests' },
-  { id: 'claims', label: 'Claims' },
-  { id: 'password', label: 'Update Password' },
-  { id: 'achievements', label: 'Achievements' },
-  { id: 'bug-reports', label: 'Bug Reports' },
-  { id: 'logout', label: 'Logout' },
+  { id: 'personal', label: 'Personal Details', defaultEmoji: '📝' },
+  { id: 'reviews', label: 'Reviews', defaultEmoji: '⭐' },
+  { id: 'donations', label: 'Donations', defaultEmoji: '💝' },
+  { id: 'requests', label: 'Help Requests', defaultEmoji: '📢' },
+  { id: 'claims', label: 'Claims', defaultEmoji: '📄' },
+  { id: 'password', label: 'Update Password', defaultEmoji: '🔒' },
+  { id: 'achievements', label: 'Achievements', defaultEmoji: '🏆' },
+  { id: 'bug-reports', label: 'Bug Reports', defaultEmoji: '🐞' },
+  { id: 'friends', label: 'Friends', defaultEmoji: '👥' },
+  { id: 'logout', label: 'Logout', defaultEmoji: '🚪' },
 ];
 
-const ProfileNav = ({ activeTab, setActiveTab }) => {
+const ProfileNav = ({ activeTab, setActiveTab, tabEmojis = {} }) => {
   return (
     <motion.div
       className="tab-nav"
@@ -32,6 +33,7 @@ const ProfileNav = ({ activeTab, setActiveTab }) => {
     >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
+        const emoji = tabEmojis[tab.id] || tab.defaultEmoji || '';
         return (
           <motion.button
             key={tab.id}
@@ -49,9 +51,12 @@ const ProfileNav = ({ activeTab, setActiveTab }) => {
               cursor: 'pointer',
               position: 'relative',
               outline: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
             }}
           >
-            {tab.label}
+            <span>{emoji}</span> {tab.label}
             {isActive && (
               <motion.div
                 layoutId="underline"

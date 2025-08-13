@@ -6,12 +6,7 @@ import {
   IconButton,
   Divider,
 } from '@mui/material';
-import {
-  Visibility,
-  VisibilityOff,
-  Google,
-  ArrowBack,
-} from '@mui/icons-material';
+import { Visibility, VisibilityOff, Google, ArrowBack } from '@mui/icons-material';
 import { IoIosLogIn } from 'react-icons/io';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
@@ -31,10 +26,7 @@ const Login = () => {
     window.location.href = 'http://localhost:5050/auth/google';
   };
 
-  const initialState = {
-    email: '',
-    password: '',
-  };
+  const initialState = { email: '', password: '' };
 
   const validationSchema = Yup.object({
     email: Yup.string().email('Invalid email address').required('Email is required'),
@@ -42,20 +34,15 @@ const Login = () => {
   });
 
   const handleSubmit = async (values) => {
-    const data = {
-      url: apis().loginUser,
-      method: 'POST',
-      body: values,
-    };
-
+    const data = { url: apis().loginUser, method: 'POST', body: values };
     const result = await httpAction(data);
 
     if (result.success) {
-      // toast.success(result.message || 'Login successful');
       setUser?.(result.user);
+      toast.success('✅ Logged in successfully!');
       navigate('/profile');
     } else {
-      // toast.error(result.error || 'Login failed');
+      toast.error(result.error || '❌ Login failed');
     }
   };
 
@@ -95,14 +82,14 @@ const Login = () => {
                 style={{ textAlign: 'center', marginBottom: '24px' }}
               >
                 <IoIosLogIn size={48} color="#1976d2" />
-                <h2 style={{ margin: '8px 0' }}>Welcome back</h2>
-                <p style={{ color: '#666' }}>Login to continue</p>
+                <h2 style={{ margin: '8px 0' }}>👋 Welcome back!</h2>
+                <p style={{ color: '#666' }}>🔑 Login to continue</p>
               </motion.div>
 
               <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
                 <TextField
                   name="email"
-                  label="Email"
+                  label="Email 📧"
                   variant="outlined"
                   fullWidth
                   margin="normal"
@@ -118,7 +105,7 @@ const Login = () => {
               <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
                 <TextField
                   name="password"
-                  label="Password"
+                  label="Password 🔒"
                   variant="outlined"
                   fullWidth
                   margin="normal"
@@ -142,7 +129,7 @@ const Login = () => {
 
               <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
                 <Button type="submit" variant="contained" fullWidth size="large" style={{ marginTop: '16px' }}>
-                  Login
+                  🔑 Login
                 </Button>
               </motion.div>
 
@@ -159,7 +146,7 @@ const Login = () => {
                   onClick={loginWithGoogle}
                   style={{ marginBottom: '12px' }}
                 >
-                  Login with Google
+                  🌎 Login with Google
                 </Button>
               </motion.div>
 
@@ -172,13 +159,18 @@ const Login = () => {
                   onClick={() => navigate('/register')}
                   style={{ marginBottom: '12px' }}
                 >
-                  Create new account
+                  🆕 Create new account
                 </Button>
               </motion.div>
 
               <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}>
-                <Button variant="text" color="error" fullWidth onClick={() => navigate('/forgot-password')}>
-                  Forgot Password?
+                <Button
+                  variant="text"
+                  color="error"
+                  fullWidth
+                  onClick={() => navigate('/forgot-password')}
+                >
+                  ❓ Forgot Password?
                 </Button>
               </motion.div>
             </motion.div>

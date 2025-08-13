@@ -19,7 +19,7 @@ const ForgotPassword = () => {
   });
 
   const handleSubmit = (values) => {
-    console.log(values);
+    console.log('📧 Forgot Password Request:', values);
     navigate('/verify-otp');
   };
 
@@ -68,8 +68,8 @@ const ForgotPassword = () => {
                 animate={{ opacity: 1, y: 0 }}
               >
                 <GrPowerReset size={30} />
-                <h2 style={{ margin: '10px 0' }}>Forgot Password</h2>
-                <p style={{ fontSize: '14px' }}>Enter your registered email</p>
+                <h2 style={{ margin: '10px 0' }}>🔄 Forgot Password</h2>
+                <p style={{ fontSize: '14px' }}>📧 Enter your registered email</p>
               </motion.div>
 
               <motion.div
@@ -104,7 +104,7 @@ const ForgotPassword = () => {
                   fullWidth
                   size="large"
                 >
-                  Send Reset OTP
+                  ✉️ Send Reset OTP
                 </Button>
               </motion.div>
 
@@ -122,7 +122,7 @@ const ForgotPassword = () => {
                   startIcon={<ArrowBack />}
                   onClick={() => navigate('/login')}
                 >
-                  Back to Login
+                  🔙 Back to Login
                 </Button>
               </motion.div>
             </Form>
