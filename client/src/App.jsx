@@ -29,6 +29,8 @@ import Home from './components/home/Home';
 import RequestHelp from './components/auth/profile/requests/RequestHelp';
 import HelpRequest from './components/auth/profile/HelpRequest';
 import DonateItem from './components/auth/profile/donatinons/DonateItem';
+import Donations from './components/auth/profile/donatinons/Donations';
+import FriendsHub from './components/frineds/FriendsHub';
 
 
 function App() {
@@ -64,11 +66,16 @@ function App() {
         <Route path='/create-request' element={<RequestHelp/>} />
         <Route path='/help-requests' element={<HelpRequest/>} />
 
+   
         <Route path='/donate' element={<DonateForm/>} />
         <Route path='/view-donations' element={<ViewDonations />} />
 
         <Route path="/donate-item" element={<DonateItem />} />
 
+
+        <Route path='/donations' element={<Donations/>} />
+
+        <Route path='/friends' element={<FriendsHub />} />
     </Routes>
 
     </main>

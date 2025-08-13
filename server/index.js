@@ -27,12 +27,17 @@ const upload = require('./middleware/multer');
 const cloudinary = require('./utils/cloudinary');
 const Image = require('./models/image');
 
+
+const friendRoutes = require('./routes/friendRoutes');
+const messageRoutes = require('./routes/messageRoutes');
+
+
 const app = express();
 
-// ✅ Create HTTP server from Express app
+//  Create HTTP server from Express app
 const http = require('http').createServer(app);
 
-// ✅ Setup Socket.IO with CORS
+//  Setup Socket.IO with CORS
 const { Server } = require('socket.io');
 const io = new Server(http, {
   cors: {
@@ -41,7 +46,7 @@ const io = new Server(http, {
   }
 });
 
-// ✅ Setup socket event handlers
+//  Setup socket event handlers
 io.on('connection', (socket) => {
   console.log('🔌 A user connected:', socket.id);
 
@@ -63,7 +68,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// ✅ Middleware
+//  Middleware
 app.use(cors({
   origin: ["http://localhost:5173", "http://localhost:5174"],
   credentials: true
@@ -82,7 +87,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ✅ Google OAuth Strategy
+//  Google OAuth Strategy
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -98,7 +103,7 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
-// ✅ Google Auth Routes
+//  Google Auth Routes
 app.get('/auth/google', passport.authenticate('google', {
   scope: ['email', 'profile'],
   prompt: 'select_account'
@@ -110,7 +115,7 @@ app.get('/auth/google/callback', passport.authenticate('google', {
   res.redirect('http://localhost:5173/profile');
 });
 
-// ✅ Image upload route
+//  Image upload route
 app.use('/uploads', express.static(path.join(__dirname, '../public', 'uploads')));
 
 app.post('/upload', upload.single('file'), async (req, res) => {
@@ -134,7 +139,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   });
 });
 
-// ✅ Register all routes
+// Register all routes
 app.use('/user', userRoutes);
 app.use('/ngo', ngoRoutes);
 app.use('/donations', donationRoutes);
@@ -147,14 +152,16 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/bug', bugRoutes);
 app.use('/api/dashboard', dashboardRoute);
 app.use('/api/items', itemsRoutes);
+app.use('/api/friends', friendRoutes);
+// app.use('/api/messages', messageRoutes);
 
-// ✅ Error handler
+//  Error handler
 app.use(errorHandler);
 
-// ✅ Connect DB
+//  Connect DB
 db();
 
-// ✅ Start server using HTTP server, not app.listen!
+//  Start server using HTTP server, not app.listen!
 const PORT = process.env.PORT || 5050;
 http.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

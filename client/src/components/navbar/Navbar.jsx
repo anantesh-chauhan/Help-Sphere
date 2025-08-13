@@ -14,10 +14,11 @@ const Navbar = () => {
   const navLinks = [
     { label: 'Home', to: '/' },
     { label: "NGO's", to: '/view-ngos' },
-    { label: 'Donate', to: '/view-donations' },
+    { label: 'Donate', to: '/donations' },
     { label: 'Help-Request', to: '/help-requests' },
     { label: 'Reviews', to: '/reviews' },
     { label: 'Report Bug', to: '/report-bug', auth: true },
+    { label: 'Friends', to: '/friends' , auth: true },
     { label: 'Login', to: '/login', guest: true },
   ];
 
