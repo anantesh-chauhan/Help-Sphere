@@ -15,12 +15,13 @@ const Navbar = () => {
 
   const navLinks = [
     { label: '🏠 Home', to: '/' },
-    { label: "🏢 NGO's", to: '/view-ngos' },
+    // { label: "🏢 NGO's", to: '/view-ngos' },
     { label: '💝 Donate', to: '/donations' },
     { label: '🆘 Help-Request', to: '/help-requests' },
     { label: '⭐ Reviews', to: '/reviews' },
     { label: '🐞 Report Bug', to: '/report-bug', auth: true },
     { label: '🤝 Friends', to: '/friends', auth: true },
+    { label: '💬 Chat', to: '/chat', auth: true },
     { label: '🔑 Login', to: '/login', guest: true },
     { label: '👤 Profile', to: '/profile', auth: true }
   ];

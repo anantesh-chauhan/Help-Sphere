@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const path = require('path');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
@@ -11,7 +10,7 @@ const googleAuth = require('./middleware/googleAuth');
 const errorHandler = require('./middleware/errorHandler');
 const db = require('./utils/db');
 
-// routes
+// Routes
 const userRoutes = require('./routes/userRoutes');
 const ngoRoutes = require('./routes/ngoRoutes');
 const helpRoutes = require('./routes/helpRequestRoutes');
@@ -29,11 +28,15 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const app = express();
 const http = require('http').createServer(app);
 
-// init socket
+// -----------------------
+// Initialize Socket.IO
+// -----------------------
 const initSocket = require('./socket');
-initSocket(http);
+initSocket(http, app);
 
-// middleware
+// -----------------------
+// Middleware
+// -----------------------
 app.use(cors({
   origin: ["http://localhost:5173", "http://localhost:5174"],
   credentials: true
@@ -49,14 +52,15 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// -----------------------
 // Google OAuth setup
+// -----------------------
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: "http://localhost:5050/auth/google/callback"
-}, (accessToken, refreshToken, profile, done) => {
-  return done(null, profile);
-}));
+}, (accessToken, refreshToken, profile, done) => done(null, profile)));
+
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
 
@@ -70,7 +74,9 @@ app.get('/auth/google/callback', passport.authenticate('google', {
   res.redirect('http://localhost:5173/profile');
 });
 
-// routes
+// -----------------------
+// API Routes
+// -----------------------
 app.use('/user', userRoutes);
 app.use('/ngo', ngoRoutes);
 app.use('/donations', donationRoutes);
@@ -87,13 +93,19 @@ app.use('/api/friends', friendRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// error handler
+// -----------------------
+// Error Handler
+// -----------------------
 app.use(errorHandler);
 
-// connect DB
+// -----------------------
+// Connect Database
+// -----------------------
 db();
 
-// start server
+// -----------------------
+// Start Server
+// -----------------------
 const PORT = process.env.PORT || 5050;
 http.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
