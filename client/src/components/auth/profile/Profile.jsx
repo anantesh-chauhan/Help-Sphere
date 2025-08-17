@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import HelpRequest from './HelpRequest';
 import Donations from './donatinons/Donations';
 import FriendsHub from '../../frineds/FriendsHub';
+import UserDashboard from './UserDashboard';
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('personal');
@@ -53,6 +54,15 @@ const Profile = () => {
       >
         <BasicInfo />
       </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <UserDashboard />
+      </motion.div>
+
 
       <motion.div
         initial={{ opacity: 0 }}
