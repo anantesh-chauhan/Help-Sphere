@@ -52,7 +52,7 @@ const DonateItem = () => {
     data.append("file", file);
 
     try {
-      const res = await axios.post(`${backendUrl}/upload`, data, {
+      const res = await axios.post(`${backendUrl}/api/upload`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("✅ Image uploaded successfully");

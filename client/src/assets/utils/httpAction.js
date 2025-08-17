@@ -18,7 +18,7 @@ const httpAction = async (data) => {
     if (!response.ok) {
       // Show toast for client-side errors (like wrong password)
       if (response.status >= 400 && response.status < 500) {
-        toast.error(result.message || 'Invalid credentials');
+        // toast.error(result.message || 'Invalid credentials');
         return { success: false, error: result.message };
       }
 
@@ -26,11 +26,11 @@ const httpAction = async (data) => {
       throw new Error(result.message || 'Something went wrong');
     }
 
-    toast.success(result.message || 'Success');
+    // toast.success(result.message || 'Success');
     return { ...result, success: true };
 
   } catch (error) {
-    toast.error(error.message || 'Unexpected error');
+    // toast.error(error.message || 'Unexpected error');
     return { success: false, error: error.message };
   }
 };

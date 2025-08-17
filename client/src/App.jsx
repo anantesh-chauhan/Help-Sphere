@@ -33,6 +33,14 @@ import Donations from './components/auth/profile/donatinons/Donations';
 import RequestHelp from './components/auth/profile/requests/RequestHelp';
 import HelpRequest from './components/auth/profile/HelpRequest';
 import FriendsHub from './components/frineds/FriendsHub';
+import ChatPage from './components/frineds/ChatPage';
+
+// import ChatPage from './components/frineds/chat/ChatPage';
+// import ChatWindow from './components/frineds/ChatWindow';
+
+
+
+
 
 function App() {
   const [count, setCount] = useState(0);
@@ -77,9 +85,13 @@ function App() {
           <Route path="/donations" element={<Donations />} />
 
           <Route path="/friends" element={<FriendsHub />} />
+
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/chat/:friendId" element={<ChatPage />} />
+          {/* <Route path="/chat/:friendId" element={<ChatWindow/>} /> */}
         </Routes>
       </main>
-
+npi
       {/* Footer */}
       <Footer />
     </div>

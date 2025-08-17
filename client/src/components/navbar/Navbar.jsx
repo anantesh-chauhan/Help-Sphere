@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { AppContent } from '../../context/AppContext';
 import LogoutButton from '../auth/profile/Logout';
@@ -9,7 +9,8 @@ const Navbar = () => {
   const { userData } = useContext(AppContent);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  
+  const navigate = useNavigate();
   const dp = userData?.name?.charAt(0).toUpperCase() || 'U';
 
   const navLinks = [
@@ -21,6 +22,7 @@ const Navbar = () => {
     { label: '🐞 Report Bug', to: '/report-bug', auth: true },
     { label: '🤝 Friends', to: '/friends', auth: true },
     { label: '🔑 Login', to: '/login', guest: true },
+    { label: '👤 Profile', to: '/profile', auth: true }
   ];
 
   useEffect(() => {
@@ -121,7 +123,7 @@ const Navbar = () => {
           {/* User Section */}
           {userData && (
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={styles.avatar}>{dp}</div>
+              <div onClick={() => navigate('/profile')} style={styles.avatar}>{dp}</div>
               <LogoutButton />
             </div>
           )}
@@ -167,7 +169,7 @@ const Navbar = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <div style={styles.avatar}>{dp}</div>
                   <div style={{ fontSize: '0.85rem' }}>
-                    <div style={{ fontWeight: 'bold' }}>{userData.name}</div>
+                    <div onClick={() => navigate('/profile')} style={{ fontWeight: 'bold' }}>{userData.name}</div>
                     <div style={{ color: '#8c4de9' }}>{userData.email}</div>
                     <LogoutButton />
                   </div>

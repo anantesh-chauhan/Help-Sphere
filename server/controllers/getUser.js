@@ -13,9 +13,11 @@ const getUser = async (req, res , next) =>{
             status : true ,
             user : {
                 name : findUser.name ,
-                email : findUser.email 
+                email : findUser.email ,
+                _id: findUser._id
             }
         })  
+        // console.log("User found:", findUser);
     } catch (error) {
         next(error);
     }

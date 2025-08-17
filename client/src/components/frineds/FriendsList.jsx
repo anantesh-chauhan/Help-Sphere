@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { AppContent } from "../../context/AppContext";
@@ -6,6 +7,7 @@ import { AppContent } from "../../context/AppContext";
 export default function FriendsList() {
   const [friends, setFriends] = useState([]);
   const { backendUrl } = useContext(AppContent);
+  const navigate = useNavigate();
   const defaultAvatar =
     "https://res.cloudinary.com/dlixtmy1x/image/upload/v1755115315/avatar_izmj6c.webp";
 
@@ -30,6 +32,10 @@ export default function FriendsList() {
     } catch (err) {
       console.error("Error removing friend:", err);
     }
+  };
+
+  const openChat = (friendId) => {
+    navigate(`/chat/${friendId}`);
   };
 
   useEffect(() => {
@@ -72,6 +78,7 @@ export default function FriendsList() {
       transition: "all 0.2s ease",
     },
     red: { backgroundColor: "#e53935" },
+    blue: { backgroundColor: "#1e88e5" },
   };
 
   return (
@@ -81,7 +88,14 @@ export default function FriendsList() {
       </h1>
 
       {friends.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "24px", color: "#6b7280", fontSize: "16px" }}>
+        <div
+          style={{
+            textAlign: "center",
+            padding: "24px",
+            color: "#6b7280",
+            fontSize: "16px",
+          }}
+        >
           You have no friends yet. 😢
         </div>
       ) : (
@@ -96,7 +110,10 @@ export default function FriendsList() {
             <motion.div
               key={f._id}
               style={cardStyle}
-              whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(0,0,0,0.15)" }}
+              whileHover={{
+                scale: 1.05,
+                boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+              }}
             >
               <motion.img
                 src={f.avatar || defaultAvatar}
@@ -106,7 +123,9 @@ export default function FriendsList() {
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.4 }}
               />
-              <h2 style={{ fontSize: "18px", fontWeight: "bold" }}>{f.name} 🌟</h2>
+              <h2 style={{ fontSize: "18px", fontWeight: "bold" }}>
+                {f.name} 🌟
+              </h2>
               <p style={{ color: "#6b7280", fontSize: "14px" }}>{f.email}</p>
 
               <div
@@ -123,12 +142,30 @@ export default function FriendsList() {
                 <span>🤝 Helps: {f.helpRequests ?? 0}</span>
               </div>
 
-              <div style={{ marginTop: "14px" }}>
+              <div style={{ marginTop: "14px", display: "flex", gap: "10px", justifyContent: "center" }}>
+                <button
+                  // onClick={() => openChat(f._id)}
+                  onClick={() => navigate(`/chat`)}
+                  style={{ ...buttonStyle.base, ...buttonStyle.blue }}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = "#1565c0")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = "#1e88e5")
+                  }
+                >
+                  Chat 💬
+                </button>
+
                 <button
                   onClick={() => removeFriend(f._id)}
                   style={{ ...buttonStyle.base, ...buttonStyle.red }}
-                  onMouseEnter={(e) => (e.target.style.backgroundColor = "#d32f2f")}
-                  onMouseLeave={(e) => (e.target.style.backgroundColor = "#e53935")}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = "#d32f2f")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = "#e53935")
+                  }
                 >
                   Remove Friend ❌
                 </button>

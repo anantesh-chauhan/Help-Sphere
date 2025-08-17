@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { AppContent } from "../../context/AppContext";
-
+import { toast } from "react-toastify";
 export default function AllUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,14 +26,17 @@ export default function AllUsersPage() {
 
   const sendFriendRequest = async (id) => {
     try {
-      await axios.post(
+      const res =await axios.post(
         `${backendUrl}/api/friends/request`,
         { toUserId: id },
         { withCredentials: true }
       );
+      // console.log(res.data);
+      toast.success("Friend request sent!");
       fetchUsers();
     } catch (err) {
       console.error("Error sending request:", err);
+      toast.error("Failed to send friend request.");
     }
   };
 

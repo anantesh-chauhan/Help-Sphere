@@ -1,5 +1,5 @@
 const User = require('../models/User.js');
-const FriendRequest = require('../models/FriendRequest.js');
+const Friend = require('../models/FriendRequest.js');
 const Donation = require('../models/Donation.js');
 const HelpOffer = require('../models/HelpOffer.js');
 
@@ -14,7 +14,7 @@ exports.listUsers = async (req, res) => {
     ).lean();
 
     // Get friend requests involving current user
-    const requests = await FriendRequest.find({
+    const requests = await Friend.find({
       $or: [
         { from: currentUserId },
         { to: currentUserId }
@@ -64,14 +64,15 @@ exports.listUsers = async (req, res) => {
         ...user,
         friendStatus,
         donationsCount: donationMap[user.name] || 0,
-        helpOffersCount: helpOfferMap[user._id?.toString()] || 0
+        helpOffersCount: helpOfferMap[user._id?.toString()] || 0,
+        success: true
       };
     });
 
     res.json(usersWithStatus);
   } catch (error) {
     console.error('Error listing users:', error);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: 'Server Error', success: false });
   }
 };
 
@@ -87,7 +88,7 @@ exports.searchUsers = async (req, res) => {
       'name email avatar friends'
     ).lean();
 
-    const requests = await FriendRequest.find({
+    const requests = await Friend.find({
       $or: [
         { from: currentUserId },
         { to: currentUserId }
@@ -130,33 +131,52 @@ exports.searchUsers = async (req, res) => {
         ...user,
         friendStatus,
         donationsCount: donationMap[user.name] || 0,
-        helpOffersCount: helpOfferMap[user._id.toString()] || 0
+        helpOffersCount: helpOfferMap[user._id.toString()] || 0,
+        success: true
       };
     });
 
     res.json(usersWithStatus);
   } catch (err) {
     console.error('Error searching users:', err);
-    res.status(500).json({ message: 'Error searching users' });
+    res.status(500).json({ message: 'Error searching users', success: false });
   }
 };
 
 exports.sendRequest = async (req, res) => {
-  const { toUserId } = req.body;
-  if (toUserId === req.user.id) return res.status(400).json({ message: 'Cannot friend yourself' });
+  try {
+    console.log("request controller called", req.body);
+    const { toUserId } = req.body;
 
-  const exists = await FriendRequest.findOne({ from: req.user.id, to: toUserId });
-  const reverse = await FriendRequest.findOne({ from: toUserId, to: req.user.id });
-  if (exists || reverse) return res.status(400).json({ message: 'Request already exists' });
+    if (toUserId === req.user.id) {
+      return res.status(400).json({ message: 'Cannot friend yourself', success: false });
+    }
 
-  await FriendRequest.create({ from: req.user.id, to: toUserId });
-  res.json({ message: 'Friend request sent' });
+    const exists = await Friend.findOne({ from: req.user.id, to: toUserId });
+    const reverse = await Friend.findOne({ from: toUserId, to: req.user.id });
+    if (exists || reverse) {
+      return res.status(400).json({ message: 'Request already exists', success: false });
+    }
+
+    const request = await Friend.create({
+      from: req.user.id,
+      to: toUserId,
+      status: "pending" 
+    });
+
+    console.log("request created:", request);
+    res.json({ message: 'Friend request sent', success: true });
+  } catch (error) {
+    console.error("Error in sendRequest:", error); // <-- will show validation error
+    res.status(500).json({ message: error.message, success: false });
+  }
 };
+
 
 // Get all incoming friend requests
 exports.getIncoming = async (req, res) => {
   try {
-    const incoming = await FriendRequest.find({
+    const incoming = await Friend.find({
       to: req.user.id,
       status: "pending",
     }).populate("from", "_id name avatar");
@@ -164,14 +184,14 @@ exports.getIncoming = async (req, res) => {
     res.json(Array.isArray(incoming) ? incoming : []);
   } catch (error) {
     console.error("Error fetching incoming requests:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", success: false });
   }
 };
 
 // Get all outgoing friend requests
 exports.getOutgoing = async (req, res) => {
   try {
-    const outgoing = await FriendRequest.find({
+    const outgoing = await Friend.find({
       from: req.user.id,
       status: "pending",
     }).populate("to", "_id name avatar");
@@ -179,7 +199,7 @@ exports.getOutgoing = async (req, res) => {
     res.json(Array.isArray(outgoing) ? outgoing : []);
   } catch (error) {
     console.error("Error fetching outgoing requests:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", success: false });
   }
 };
 
@@ -188,14 +208,14 @@ exports.acceptRequest = async (req, res) => {
   try {
     const { requestId } = req.params;
 
-    const fr = await FriendRequest.findOne({
+    const fr = await Friend.findOne({
       _id: requestId,
       to: req.user.id,
       status: "pending",
     });
 
     if (!fr) {
-      return res.status(404).json({ message: "Friend request not found" });
+      return res.status(404).json({ message: "Friend request not found", success: false });
     }
 
     fr.status = "accepted";
@@ -208,7 +228,7 @@ exports.acceptRequest = async (req, res) => {
     res.json({ message: "Friend request accepted", requestId });
   } catch (error) {
     console.error("Error accepting request:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", success: false });
   }
 };
 
@@ -217,14 +237,14 @@ exports.rejectRequest = async (req, res) => {
   try {
     const { requestId } = req.params;
 
-    const fr = await FriendRequest.findOne({
+    const fr = await Friend.findOne({
       _id: requestId,
       to: req.user.id,
       status: "pending",
     });
 
     if (!fr) {
-      return res.status(404).json({ message: "Friend request not found" });
+      return res.status(404).json({ message: "Friend request not found", success: false });
     }
 
     fr.status = "rejected";
@@ -233,7 +253,7 @@ exports.rejectRequest = async (req, res) => {
     res.json({ message: "Friend request rejected", requestId });
   } catch (error) {
     console.error("Error rejecting request:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", success: false });
   }
 };
 
@@ -255,14 +275,14 @@ exports.cancelRequest = async (req, res) => {
     const { requestId } = req.params;
 
     // Find pending request sent by current user
-    const fr = await FriendRequest.findOne({
+    const fr = await Friend.findOne({
       _id: requestId,
       from: req.user.id,
       status: 'pending'
     });
 
     if (!fr) {
-      return res.status(404).json({ message: 'Friend request not found or already processed' });
+      return res.status(404).json({ message: 'Friend request not found or already processed', success: false });
     }
 
     // Remove request
@@ -271,7 +291,7 @@ exports.cancelRequest = async (req, res) => {
     res.json({ message: 'Friend request cancelled successfully' });
   } catch (error) {
     console.error('Error cancelling friend request:', error);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: 'Server Error', success: false });
   }
 };
 

@@ -8,7 +8,7 @@ export const AppContextProvider = ({ children }) => {
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [userData, setUserData] = useState(null);
-
+  const [userId, setUserId] = useState(null);
   // ✅ Load user on app mount
   useEffect(() => {
     loadUser();
@@ -28,10 +28,12 @@ export const AppContextProvider = ({ children }) => {
 
   const loadUser = async () => {
     try {
-      const res = await axios.get(`${backendUrl}/api/user/profile`, {
+      const res = await axios.get(`${backendUrl}/user/profile`, {
         withCredentials: true,
       });
+      console.log(`User data loaded:`, res.data)
       if (res.data?.user) {
+        setUserId(res.data.user._id);
         setUserData(res.data.user);
         setIsAdmin(res.data.user.role === "admin");
       }
@@ -45,6 +47,7 @@ export const AppContextProvider = ({ children }) => {
     backendUrl,
     isAdmin,
     userData,
+    userId,
     setIsAdmin,
     setUserData,
     handleLogin,

@@ -2,7 +2,7 @@ import { useState, useContext } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { AppContent } from '../../context/AppContext';
-
+import { toast } from 'react-toastify';
 export default function SearchUsers() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -25,9 +25,11 @@ export default function SearchUsers() {
   const sendRequest = async (id) => {
     try {
       await axios.post(`${backendUrl}/api/friends/request`, { toUserId: id }, { withCredentials: true });
+      toast.success('Friend request sent!');
       search();
     } catch (err) {
       console.error('Error sending friend request:', err);
+      toast.error('Failed to send friend request.');
     }
   };
 
