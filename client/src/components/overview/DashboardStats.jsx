@@ -8,8 +8,31 @@ import {
   useTheme,
 } from '@mui/material';
 import { motion } from 'framer-motion';
+import { Bar, Pie, Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 import httpAction from '../../assets/utils/httpAction';
 import apis from '../../assets/utils/apis';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Tooltip,
+  Legend
+);
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -18,6 +41,11 @@ const cardVariants = {
     y: 0,
     transition: { delay: i * 0.1 },
   }),
+};
+
+const chartVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
 };
 
 const DashboardStats = () => {
@@ -46,6 +74,53 @@ const DashboardStats = () => {
     { label: '🤝 Help Offers', value: stats.helpOffers },
   ];
 
+  // -------------------
+  // Chart Data
+  // -------------------
+  const barData = {
+    labels: ['Users', 'Requests', 'Donations', 'Reviews', 'NGOs', 'Bugs', 'Help Offers'],
+    datasets: [
+      {
+        label: 'Platform Stats',
+        data: [
+          stats.totalUsers,
+          stats.totalRequests,
+          stats.totalDonations,
+          stats.totalReviews,
+          stats.activeNGOs,
+          stats.bugReports,
+          stats.helpOffers,
+        ],
+        backgroundColor: '#7b1fa2',
+      },
+    ],
+  };
+
+  const pieData = {
+    labels: ['Requests', 'Donations', 'Reviews', 'Help Offers'],
+    datasets: [
+      {
+        data: [stats.totalRequests, stats.totalDonations, stats.totalReviews, stats.helpOffers],
+        backgroundColor: ['#1cc88a', '#36b9cc', '#f6c23e', '#ff6384'],
+        hoverOffset: 10,
+      },
+    ],
+  };
+
+  const lineData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [
+      {
+        label: 'User Growth',
+        data: [10, 20, 35, 50, 65, stats.totalUsers || 0],
+        borderColor: '#4e73df',
+        backgroundColor: '#4e73df33',
+        tension: 0.4,
+        fill: true,
+      },
+    ],
+  };
+
   return (
     <Box sx={{ p: isMobile ? 2 : 4, backgroundColor: '#f3e5f5' }}>
       <Typography
@@ -60,6 +135,7 @@ const DashboardStats = () => {
         📊 Platform Overview
       </Typography>
 
+      {/* Stats Cards */}
       <Grid
         container
         spacing={3}
@@ -109,6 +185,75 @@ const DashboardStats = () => {
           </Grid>
         ))}
       </Grid>
+
+      {/* Charts Title */}
+      <Typography
+        variant="h6"
+        sx={{
+          fontWeight: 700,
+          color: '#311b92',
+          textAlign: 'center',
+          my: 3,
+        }}
+      >
+        Visual Stats
+      </Typography>
+
+      {/* Charts */}
+      {/* Charts */}
+<Grid
+  container
+  spacing={3}
+  sx={{
+    display: 'grid',
+    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, // 1 in row on small, 2 in row on large
+    gap: 3,
+  }}
+>
+  {[{ title: 'Activity Bar Chart', data: barData, type: 'bar' },
+    { title: 'Activity Pie Chart', data: pieData, type: 'pie' },
+    { title: 'User Growth Line', data: lineData, type: 'line' }].map(
+    (chart, idx) => (
+      <motion.div
+        key={idx}
+        variants={chartVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <Paper
+          sx={{
+            p: 2,
+            borderRadius: 3,
+            boxShadow: 3,
+            backgroundColor: '#fff',
+            height: 250,
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              mb: 1,
+              fontWeight: 'bold',
+              color: '#311b92',
+              textAlign: 'center',
+            }}
+          >
+            {chart.title}
+          </Typography>
+          <Box sx={{ flex: 1, width: '100%' }}>
+            {chart.type === 'bar' && <Bar data={chart.data} options={{ responsive: true, maintainAspectRatio: false }} />}
+            {chart.type === 'pie' && <Pie data={chart.data} options={{ responsive: true, maintainAspectRatio: false }} />}
+            {chart.type === 'line' && <Line data={chart.data} options={{ responsive: true, maintainAspectRatio: false }} />}
+          </Box>
+        </Paper>
+      </motion.div>
+    )
+  )}
+</Grid>
+
     </Box>
   );
 };

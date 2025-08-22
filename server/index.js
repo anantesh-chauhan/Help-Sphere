@@ -28,6 +28,8 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const app = express();
 const http = require('http').createServer(app);
 
+const backendUrl = process.env.BACKEND_URL || 'http://localhost:5050';
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 // -----------------------
 // Initialize Socket.IO
 // -----------------------
@@ -38,7 +40,7 @@ initSocket(http, app);
 // Middleware
 // -----------------------
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: [`${frontendUrl}`, "http://localhost:5174"],
   credentials: true
 }));
 app.use(express.json());
@@ -58,7 +60,7 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:5050/auth/google/callback"
+  callbackURL: `${backendUrl}/auth/google/callback`
 }, (accessToken, refreshToken, profile, done) => done(null, profile)));
 
 passport.serializeUser((user, done) => done(null, user));
@@ -69,9 +71,9 @@ app.get('/auth/google', passport.authenticate('google', {
   prompt: 'select_account'
 }));
 app.get('/auth/google/callback', passport.authenticate('google', {
-  failureRedirect: 'http://localhost:5173/login'
+  failureRedirect: `${frontendUrl}/login`
 }), googleAuth, (req, res) => {
-  res.redirect('http://localhost:5173/profile');
+  res.redirect(`${frontendUrl}/profile`);
 });
 
 // -----------------------

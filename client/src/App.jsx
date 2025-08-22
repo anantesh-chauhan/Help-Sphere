@@ -60,7 +60,7 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main style={{ flex: 1, width: '100%', margin: 0, padding: 0 }}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -91,7 +91,7 @@ function App() {
           {/* <Route path="/chat/:friendId" element={<ChatWindow/>} /> */}
         </Routes>
       </main>
-npi
+
       {/* Footer */}
       <Footer />
     </div>

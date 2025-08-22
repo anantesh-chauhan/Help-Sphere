@@ -7,9 +7,9 @@ const Home = () => {
     <div
       style={{
         fontFamily: 'Arial, sans-serif',
-        padding: '0 5%',
-        maxWidth: '1400px',
-        margin: '0 auto',
+        width: '100%',
+        margin: 0,       // remove auto margin
+        padding: 0,      // remove side padding
       }}
     >
       {/* Hero Section */}

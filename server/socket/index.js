@@ -1,9 +1,9 @@
 const { Server } = require('socket.io');
-
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 function initSocket(httpServer, app) {
   const io = new Server(httpServer, {
     cors: {
-      origin: ["http://localhost:5173", "http://localhost:5174"],
+      origin: [frontendUrl, "http://localhost:5174"],
       credentials: true
     }
   });

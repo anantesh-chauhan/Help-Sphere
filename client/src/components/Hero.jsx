@@ -23,6 +23,25 @@ const Hero = () => {
     return (
         <section className="w-full overflow-hidden bg-white">
             <div className="max-w-7xl mx-auto  flex flex-col md:flex-row items-center gap-8">
+                
+
+                {/* Auto-Slider Image Section */}
+                <div className="flex-1 flex justify-center items-center relative w-full h-[300px] md:h-[350px] lg:h-[400px]">
+                    <AnimatePresence mode="wait">
+                        <motion.img
+                            key={images[current]}
+                            src={images[current]}
+                            alt={`hero-${current}`}
+                            className="w-full max-w-md h-full object-cover rounded-lg shadow-lg"
+                            initial={{ opacity: 0, x: 50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -50 }}
+                            transition={{ duration: 0.6 }}
+                            style={{ width: '100%', height: '70vh', objectFit: 'fill', borderRadius: '10px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)', marginBottom: '20px', marginTop: '0px' }}
+                        />
+                    </AnimatePresence>
+                </div>
+
                 {/* Text Section */}
                 <motion.div
                     className="flex-1 text-center md:text-left"
@@ -46,23 +65,6 @@ const Hero = () => {
                     </motion.a>
 
                 </motion.div>
-
-                {/* Auto-Slider Image Section */}
-                <div className="flex-1 flex justify-center items-center relative w-full h-[300px] md:h-[350px] lg:h-[400px]">
-                    <AnimatePresence mode="wait">
-                        <motion.img
-                            key={images[current]}
-                            src={images[current]}
-                            alt={`hero-${current}`}
-                            className="w-full max-w-md h-full object-cover rounded-lg shadow-lg"
-                            initial={{ opacity: 0, x: 50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -50 }}
-                            transition={{ duration: 0.6 }}
-                            style={{ width: '100%', height: '70vh', objectFit: 'fill', borderRadius: '10px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)', marginBottom: '20px', marginTop: '0px' }}
-                        />
-                    </AnimatePresence>
-                </div>
             </div>
         </section>
     );
