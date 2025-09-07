@@ -30,15 +30,11 @@ const http = require('http').createServer(app);
 
 const backendUrl = process.env.BACKEND_URL || 'http://localhost:5050';
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-// -----------------------
 // Initialize Socket.IO
-// -----------------------
 const initSocket = require('./socket');
 initSocket(http, app);
 
-// -----------------------
 // Middleware
-// -----------------------
 app.use(cors({
   origin: [`${frontendUrl}`, "http://localhost:5174"],
   credentials: true
@@ -54,9 +50,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// -----------------------
 // Google OAuth setup
-// -----------------------
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -76,9 +70,7 @@ app.get('/auth/google/callback', passport.authenticate('google', {
   res.redirect(`${frontendUrl}/profile`);
 });
 
-// -----------------------
 // API Routes
-// -----------------------
 app.use('/user', userRoutes);
 app.use('/ngo', ngoRoutes);
 app.use('/donations', donationRoutes);
@@ -86,7 +78,7 @@ app.use('/ngos', ngoRoutes);
 app.use('/help', helpRoutes);
 app.use('/donation', donationRoutes);
 app.use('/api/weather', weatherRoutes);
-app.use('/api', locationRoutes);
+app.use('/api/location', locationRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/bug', bugRoutes);
 app.use('/api/dashboard', dashboardRoute);
@@ -95,19 +87,13 @@ app.use('/api/friends', friendRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// -----------------------
 // Error Handler
-// -----------------------
 app.use(errorHandler);
 
-// -----------------------
 // Connect Database
-// -----------------------
 db();
 
-// -----------------------
 // Start Server
-// -----------------------
 const PORT = process.env.PORT || 5050;
 http.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

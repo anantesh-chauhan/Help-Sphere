@@ -3,6 +3,6 @@ const { getUserLocationByIP } = require('../controllers/getIpLocation');
 
 const router = express.Router();
 
-router.get('/location', getUserLocationByIP);
+router.get('/', getUserLocationByIP);
 
 module.exports = router;

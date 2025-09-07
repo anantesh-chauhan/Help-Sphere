@@ -3,10 +3,20 @@ const axios = require("axios");
 const ipCache = new Map(); // { ip: { data, expiry } }
 
 const getUserLocationByIP = async (req, res) => {
+  console.log("Fetching user location...");
   try {
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    let ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
 
-    // check cache (e.g., valid for 1 hour)
+    // Extract first IP if multiple
+    ip = ip.split(",")[0].trim();
+
+    // Handle localhost IPs
+    if (ip === "::1" || ip.startsWith("127.") || ip === "") {
+      console.log("⚠️ Localhost detected, using fallback IP");
+      ip = "117.98.34.90"; // fallback: Google DNS IP
+    }
+
+    // check cache (valid for 1 hour)
     const cached = ipCache.get(ip);
     if (cached && cached.expiry > Date.now()) {
       return res.json(cached.data);
@@ -27,7 +37,7 @@ const getUserLocationByIP = async (req, res) => {
 
     res.json(locationData);
   } catch (error) {
-    console.error(error.message);
+    console.error("❌ Location error:", error.message);
     res.status(500).json({ error: "Failed to get location by IP" });
   }
 };

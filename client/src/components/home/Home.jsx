@@ -1,6 +1,7 @@
 import React from 'react';
 import Hero from '../Hero';
 import DashboardStats from '../overview/DashboardStats';
+import YogaHealix from './YogaHealix';
 
 const Home = () => {
   return (
@@ -8,8 +9,8 @@ const Home = () => {
       style={{
         fontFamily: 'Arial, sans-serif',
         width: '100%',
-        margin: 0,       // remove auto margin
-        padding: 0,      // remove side padding
+        margin: 0,
+        padding: 0,
       }}
     >
       {/* Hero Section */}
@@ -20,8 +21,13 @@ const Home = () => {
       {/* Dashboard Stats */}
       <div style={{ marginTop: '40px', width: '100%' }}>
         <DashboardStats />
+      </div >
+
+      <div style={{ marginTop: '40px', width: '100%' }}>
+        <YogaHealix />
       </div>
-    </div>
+
+      </div>
   );
 };
 

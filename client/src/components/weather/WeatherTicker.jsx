@@ -1,22 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { motion, useAnimation } from 'framer-motion';
-
+import { AppContent } from '../../context/AppContext';
 const WeatherTicker = () => {
   const [weather, setWeather] = useState(null);
   const [dateTime, setDateTime] = useState('');
   const [error, setError] = useState('');
   const tickerRef = useRef();
   const controls = useAnimation();
-
+  const {backendUrl} = useContext(AppContent);
   // Fetch weather
   useEffect(() => {
     const fetchWeatherFromIP = async () => {
       try {
-        const locationRes = await axios.get('http://localhost:5050/api/location');
+        const locationRes = await axios.get(`${backendUrl}/api/location`);
         const { latitude, longitude, city } = locationRes.data;
 
-        const weatherRes = await axios.post('http://localhost:5050/api/weather', {
+        const weatherRes = await axios.post(`${backendUrl}/api/weather`, {
           latitude,
           longitude,
         });
